@@ -7,6 +7,7 @@ const nextConfig = {
   output: "export",
   images: {
     loader: "custom",
+    loaderFile: "./app/loader.ts",
   },
 }
 
