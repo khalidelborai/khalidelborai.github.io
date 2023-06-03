@@ -1,14 +1,18 @@
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Metadata } from 'next';
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 
+
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Khalid Elborai",
   description: "Read my thoughts on software development and life.",
+  creator: "Khalid Elborai",
+  publisher: "Khalid Elborai",
 };
 
 interface RootLayoutProps {
@@ -26,6 +30,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <header>
               <div className="flex items-center justify-between">
                 <ModeToggle />
+                <h1 className="text-3xl font-bold ml-auto">
+                  Khalid Elborai
+                </h1>
                 <nav className="ml-auto text-md font-medium space-x-6">
                   <Link href="/">Home</Link>
                   <Link href="/about">About</Link>
