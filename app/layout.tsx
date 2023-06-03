@@ -1,4 +1,3 @@
-import { Analytics } from "@/components/analytics";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Inter } from "next/font/google";
@@ -35,7 +34,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
             </header>
             <main>{children}</main>
           </div>
-          <Analytics />
         </ThemeProvider>
       </body>
     </html>
