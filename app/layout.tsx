@@ -1,5 +1,6 @@
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
+import config from "@config/site";
 import { Metadata } from 'next';
 import { Inter } from "next/font/google";
 import Link from "next/link";
@@ -9,10 +10,10 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Khalid Elborai",
-  description: "Read my thoughts on software development and life.",
-  creator: "Khalid Elborai",
-  publisher: "Khalid Elborai",
+  title: config.name,
+  description: config.description,
+  creator: config.creator,
+  publisher: config.publisher,
 };
 
 interface RootLayoutProps {
@@ -39,7 +40,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 </nav>
               </div>
             </header>
-            <main>{children}</main>
+            <main className="mt-4">{children}</main>
           </div>
         </ThemeProvider>
       </body>

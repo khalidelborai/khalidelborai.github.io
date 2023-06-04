@@ -33,6 +33,9 @@ export const Page = defineDocumentType(() => ({
     description: {
       type: "string",
     },
+    image: {
+      type: "string",
+    },
   },
   computedFields,
 }))
@@ -53,6 +56,10 @@ export const Post = defineDocumentType(() => ({
       type: "date",
       required: true,
     },
+    tags: {
+      type: "list",
+      of: { type: "string" },
+    },
   },
   computedFields,
 }))
@@ -69,7 +76,7 @@ export default makeSource({
         rehypePrettyCode,
         {
           theme: {
-            dark: "one-dark-pro",
+            dark: "material-theme-darker",
             light: "github-light",
           },
           onVisitLine(node) {
