@@ -1,7 +1,26 @@
 import { allPosts } from "@/.contentlayer/generated";
 import Link from "next/link";
 
-export default function Home(
+interface TagsProps {
+    params: {
+        tag: string[];
+    };
+}
+
+export async function generateStaticParams(): Promise<TagsProps["params"][]> {
+    const tags = allPosts.flatMap((post) => post.tags ?? []);
+    let uniqueTags: string[] = [];
+    tags.forEach((tag) => {
+        if (!uniqueTags.includes(tag)) {
+            uniqueTags.push(tag);
+        }
+    });
+    return uniqueTags.map((tag) => ({
+        tag: [tag],
+    }));
+}
+
+export default function Tags(
     // tag param
     { params }: {
         params: {
@@ -12,7 +31,7 @@ export default function Home(
 ) {
     return (
         <div className="prose dark:prose-invert">
-            
+
             {allPosts
                 .filter((post) => post?.tags?.includes(params.tag[0]))
                 .map((post) => (
