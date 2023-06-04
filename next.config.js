@@ -4,7 +4,8 @@ const { withContentlayer } = require("next-contentlayer");
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // output: "export",
+  output: "export",
+
   // if production, use custom loader
 
   images: {
