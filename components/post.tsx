@@ -54,24 +54,6 @@ export default function PostCard({ post }: {
                         </div>
                     )
                 }
-                {
-                    post?.categories && (
-                        <div className="flex flex-row gap-2">
-                            Categories:
-                            {
-                                post?.categories.map((category) => (
-                                    <Link className="text-sm text-slate-600 dark:text-slate-400 rounded-md border-b-2 p-1 border-blue-200"
-                                        href={`/posts/category/${category}`}
-                                        key={
-                                            category
-                                        }>
-                                        {category}
-                                    </Link>
-                                ))
-                            }
-                        </div>
-                    )
-                }
             </CardFooter>
 
         </Card>
