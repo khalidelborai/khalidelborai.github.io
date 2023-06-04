@@ -23,7 +23,7 @@ export default function PostCard({ post }: {
                 <CardTitle
                     className="dark:text-blue-400 hover:text-blue-400 dark:hover:text-blue-300"
                 >
-                    <Link href={post.slug}>
+                    <Link href={post.slug} aria-label={post.title}>
                         {post.title}
                     </Link>
                 </CardTitle>
@@ -42,6 +42,7 @@ export default function PostCard({ post }: {
                                 post?.tags.map((tag) => (
                                     <Link
                                         href={`/posts/tag/${tag}`}
+                                        aria-label={tag}
                                         key={
                                             tag
                                         }>

@@ -9,10 +9,8 @@ const nextConfig = {
   // if production, use custom loader
 
   images: {
-    ...(process.env.NODE_ENV === "production" && {
-      loader: "custom",
-      loaderFile: "./app/loader.ts",
-    }),
+    loader: "custom",
+    loaderFile: "./app/loader.ts",
   },
 }
 
