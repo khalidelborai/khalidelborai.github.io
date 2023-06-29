@@ -6,6 +6,8 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Khalid Elborai - Home",
   description: "Khalid Elborai's personal blog",
+  icons: "favicon.ico"
+
 };
 
 export default function Home() {
