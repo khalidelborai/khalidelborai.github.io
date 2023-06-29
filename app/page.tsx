@@ -1,8 +1,9 @@
 import { allPosts } from "@/.contentlayer/generated";
 import PostCard from "@/components/post";
+import { Metadata } from "next";
 
 
-export const meta = {
+export const metadata: Metadata = {
   title: "Khalid Elborai - Home",
   description: "Khalid Elborai's personal blog",
 };
