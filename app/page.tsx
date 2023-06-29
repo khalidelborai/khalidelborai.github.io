@@ -2,6 +2,11 @@ import { allPosts } from "@/.contentlayer/generated";
 import PostCard from "@/components/post";
 
 
+export const meta = {
+  title: "Khalid Elborai - Home",
+  description: "Khalid Elborai's personal blog",
+};
+
 export default function Home() {
   return (
     <div className="flex flex-col gap-2">
