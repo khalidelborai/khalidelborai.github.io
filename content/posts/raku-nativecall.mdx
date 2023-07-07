@@ -1,0 +1,179 @@
+---
+title: Raku NativeCall notes
+description: integrate native libraries, C and C++, into Raku.
+date: 2023-07-06
+tags:
+  - raku
+  - nativecall
+  - c
+  - c++
+  - ffi
+  - integration
+---
+
+
+# Types
+
+| Raku      | C Type             |
+| --------- | ------------------ |
+| int8      | int8_t             |
+| uint8     | uint8_t            |
+| int16     | int16_t            |
+| uint16    | uint16_t           |
+| int32     | int32_t            |
+| uint32    | uint32_t           |
+| int64     | int63_t            |
+| uint64    | uint64_t           |
+| num32     | fload              |
+| num46     | double             |
+| long      | long               |
+| longlong  | long long          |
+| ulong     | unsigned long      |
+| ulonglong | unsigned long long |
+| size_t    | size_t             |
+| ssize_t   | ssize_t            |
+| bool      | bool               |
+| void      | void               |
+
+
+Let's look at this `C` code.
+
+```c
+#include <stdio.h>
+
+#ifdef _WIN32
+
+#define DLLEXPORT __declspec(dllexport)
+
+#else
+
+#define DLLEXPORT extern
+
+#endif
+
+int addNumbers(int a, int b); // prototype
+
+DLLEXPORT int addNumbers(int a, int b) {
+	int result;
+	result = a + b;
+	return result;
+}
+```
+
+We see a function prototype for `addNumbers` that holds the following information.
+
+1. name of the function `addNumbers`
+2. return type of the function `int`
+3. two arguments of type `int` 
+
+then we see the function definition that contains the implementation in a code block.
+
+To port this `C` code in `Raku` we need to compile a shared library from it first. 
+
+- Compiling with Position Independent Code
+
+	`gcc -c -Wall -Werror -fpic sample.c`
+
+- Creating a shared library from the object file 
+
+	`gcc -shared -o libsample.so sample.o`
+
+Now let's see how we can use `Raku`'s `NativeCall` to call the `addNumbers` function.
+
+```perl6
+use NativeCall;
+
+constant LIB = "$*CWD/sample";
+
+sub addNumbers(int32, int32 --> int32) is native(LIB) {}
+
+sub c_add(int32, int32 --> int32) is native(LIB) is symbol('addNumbers') { * }
+
+say addNumbers(5,2);
+say c_add(3,4);
+```
+
+Now let's add another `C` function
+```c
+DLLEXPORT void addNumbers2(int a, int b, int *result) {
+	*result = a + b;
+}
+```
+	recompile using the previous steps
+
+as you can see it's the same function but takes a pointer to store the result in it.
+
+to implement this function in `Raku` it would look like
+
+```perl6
+sub addNumbers2(int32, int32, int32 is rw) is native(LIB) {}
+
+my int32 $result = 0;
+addNumbers2(5,2,$result);
+say $result;
+```
+
+Notice `int32 is rw` because the function needs a pointer to a native type int.
+also we need to define the `$result` with a native type `int32`.
+
+The lack of the `-->` or `returns` traits indicates a `void` return type. (Don't use `void` as a return type).
+
+Let's look at some other examples
+
+```c
+DLLEXPORT char *concatStrings(char *a, char *b) {
+	const size_t len1 = strlen(a);
+	const size_t len2 = strlen(b);
+	char *result = malloc(len1 + len2 + 1);
+	memcpy(result, a, len1);
+	memcpy(result + len1, b, len2 + 1);
+	return result;
+}
+```
+
+```perl6
+sub concatStrings(Str, Str --> Str) is native(LIB) {}
+say concatStrings("Hello ", "World");
+```
+
+```c
+DLLEXPORT char *concat_strings(const char *strings[], size_t num_strings) {
+	size_t total_length = 0;
+	
+	for (size_t i = 0; i < num_strings; ++i){
+		total_length += strlen(strings[i]);
+	}
+	
+	char *result = (char *)malloc(total_length + 1);
+	
+	if (!result) {
+		perror("Memory allocation failed");
+		exit(EXIT_FAILURE);
+	}
+	
+	char *current_position = result;
+	
+	for (size_t i = 0; i < num_strings; ++i) {
+		strcpy(current_position, strings[i]);
+		current_position += strlen(strings[i]);
+	}
+	
+	*current_position = '\0';
+	return result;
+
+}
+```
+
+```perl6
+my @array := CArray[Str].new("Hello ", "World", "!");
+sub concat_strings(CArray[Str], int32 --> Str) is native(LIB) {}
+say concat_strings(@array, @array.elems);
+```
+
+As you noticed there is a type for `Arrays` in `NativeCall` which is `CArray`
+and in our case here `char *strings[]` is equal to `CArray[Str]`.
+
+in this line `my @array := CArray[Str].new("Hello ", "World", "!");` 
+
+- Binding `:=` was used instead of assignment `=` because if we assign it will be a `Raku` array.
+- Another way is to use the `$` sigil with assignment. `my $array = CArray.new(...)`
