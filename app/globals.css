@@ -150,5 +150,5 @@ p > code, li > code {
 
 
 pre[data-language][data-theme="light"] {
-  @apply !bg-[#ebebeb];
+  @apply !bg-gray-100;
 }

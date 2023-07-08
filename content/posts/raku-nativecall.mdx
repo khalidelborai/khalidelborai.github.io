@@ -93,6 +93,11 @@ say addNumbers(5,2);
 say c_add(3,4);
 ```
 
+Notice `is symbol` trait which is used to specify the name of the function in the shared library.
+because the name of the `Raku` function is different from the name of the `C` function.
+
+See [NativeCall changing names](https://docs.raku.org/language/nativecall#Changing_names).
+
 Now let's add another `C` function
 ```c
 DLLEXPORT void addNumbers2(int a, int b, int *result) {
