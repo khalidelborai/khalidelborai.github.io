@@ -76,7 +76,7 @@ export default makeSource({
         rehypePrettyCode,
         {
           theme: {
-            dark: "material-theme-darker",
+            dark: "github-dark",
             light: "github-light",
           },
           onVisitLine(node) {

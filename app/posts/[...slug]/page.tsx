@@ -54,7 +54,7 @@ export default async function PostPage({ params }: PostProps) {
 
 
   return (
-    <article className="py-6 prose dark:prose-invert lg:prose-xl md:prose-base">
+    <article className="py-6 prose dark:prose-invert lg:prose-xl md:prose-base prose-table:text-center">
       <h1 className="mb-2">{post.title}</h1> <span className="text-sm text-slate-600 dark:text-slate-400">{post.readingTime}</span> 
       {post.description && (
         <p className="text-xl mt-0 text-slate-700 dark:text-slate-200">
@@ -63,6 +63,7 @@ export default async function PostPage({ params }: PostProps) {
       )}
       <hr className="my-4" />
       <Mdx code={post.body.code} />
+
     </article>
   );
 }
