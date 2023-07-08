@@ -131,6 +131,6 @@ code > .line::before {
 }
 
 
-p > code {
+p > code, li > code {
   @apply bg-gray-100 dark:bg-gray-800 rounded-md px-1 py-0.5;
 }
