@@ -81,7 +81,7 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   pre[data-theme="light"],
   code[data-theme="light"],
   div[data-rehype-pretty-code-title][data-theme="light"] {
@@ -92,10 +92,23 @@
 @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
   pre[data-theme="dark"],
   code[data-theme="dark"],
-  div[data-rehype-pretty-code-title][data-theme="light"] {
+  div[data-rehype-pretty-code-title][data-theme="dark"] {
     display: none;
   }
+} */
+
+html.dark pre[data-theme="light"],
+html.dark code[data-theme="light"],
+html.dark div[data-rehype-pretty-code-title][data-theme="light"] {
+  display: none;
 }
+
+html.light pre[data-theme="dark"],
+html.light code[data-theme="dark"],
+html.light div[data-rehype-pretty-code-title][data-theme="dark"] {
+  display: none;
+}
+
 
 [data-rehype-pretty-code-fragment] code {
   @apply grid min-w-full break-words rounded-none border-0 bg-transparent p-0 text-sm;
@@ -113,7 +126,7 @@
 }
 
 [data-rehype-pretty-code-title] + pre {
-  @apply mt-0 rounded-t-none border-t-0;
+  @apply mt-0 rounded-t-none border-t-0 ;
 }
 
 code {
@@ -133,4 +146,9 @@ code > .line::before {
 
 p > code, li > code {
   @apply bg-gray-100 dark:bg-gray-800 rounded-md px-1 py-0.5;
+}
+
+
+pre[data-language][data-theme="light"] {
+  @apply !bg-[#ebebeb];
 }
