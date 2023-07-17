@@ -1,0 +1,269 @@
+---
+title: Python Typing notes
+description: Typing python code notes
+date: 2023-07-16
+tags:
+  - python
+  - typing
+---
+
+Python as a dynamic language, dose not enforce data types.
+However as the code grows larger, it is important to have a clear understanding of the data types.
+
+Python 3.5 introduced the typing module that provides standard definitions for type hints.
+
+## Type hints
+
+Type hints, also known as 'type annotations', are a new syntax that allows us to annotate code with expected types of variables, class attributes, function parameters and function return values.
+They are a form of documentation that makes code easier to read and understand.
+
+a normal python code:
+
+```python
+sum = 0
+message = 'hello'
+def add(a, b):
+    return a + b
+```
+
+a function definition with type hints:
+
+```python
+sum: int = 0
+message: str = 'hello'
+def add(a: int, b: int) -> int:
+    return a + b
+```
+
+the `a: int` and `b: int` are the type hints for the function parameters, and the `-> int` is the type hint for the return value.
+`sum: int = 0` and `message: str = 'hello'` are the type hints for the variables.
+
+## Built-in types
+
+- Variables
+
+  ```python
+  age: int = 20
+  pi: float = 3.14159
+  is_awake: bool = True
+  name: str = "Alice"
+  bytes_: bytes = b"Hello"
+  ```
+
+- Collections
+
+  - from python 3.9
+
+  ```python
+  friends: list[str] = ["Alice", "Bob", "Charlie"]
+  unique_numbers: set[int] = {1, 2, 3, 4, 5}
+  student_scores: dict[str, float] = {"Alice": 92.5, "Bob": 89.0}
+  coordinates: tuple[float, float] = (25.0, 45.0)
+  ```
+
+  - from python 3.10
+
+  ```python
+    x: list[int | str] = [3, 5, "test", "fun"]  # Python 3.10+
+  ```
+
+- Functions
+
+  ```python
+  def add_numbers(num1: int, num2: int) -> int:
+      return num1 + num2
+  ```
+
+- Classes
+
+  ```python
+  class Person:
+      def __init__(self, name: str, age: int) -> None:
+          self.name = name
+          self.age = age
+  ```
+
+## Deep dive into typing module
+
+### Type aliases
+
+Type aliases are a way to give a new name to an existing type.
+They are useful for simplifying complex type definitions and for providing better documentation.
+
+```python
+Vector = list[float]
+
+def scale(scalar: float, vector: Vector) -> Vector:
+    return [scalar * num for num in vector]
+
+new_vector = scale(2.0, [1.0, -4.2, 5.4])
+```
+
+```python
+from collections.abc import Sequence
+
+ServerOptions = dict[str, str]
+UserInformation = tuple[str, str, int]
+Server = tuple[ServersOptions, UserInformation]
+Servers = Sequence[Server]
+
+def send_message(servers: Servers, message: str) -> None:
+    ...
+
+# the above code is equivalent to the following code
+def send_message_2(servers: Sequence[tuple[dict[str, str], tuple[str, str, int]]], message: str) -> None:
+    ...
+```
+
+we can mark type aliases with `TypeAlias` to make it clear that they are aliases.
+
+```python
+from typing import TypeAlias
+
+Vector: TypeAlias = list[float]
+```
+
+### NewType
+
+`NewType` is a function that creates a new type from an existing type.
+
+```python
+from typing import NewType
+
+UserName = NewType("UserName", str)
+Password = NewType("Password", str)
+
+def login(username: UserName, password: Password) -> None:
+    ...
+```
+
+### Type variables
+
+Type variables are used to annotate generic types.
+They are used in place of concrete types when we want to write code that can work with any type.
+
+```python
+from typing import TypeVar
+
+T = TypeVar("T")
+
+def first(items: list[T]) -> T:
+    return items[0]
+```
+
+### Generics
+
+Generics are a way to define generic types.
+They are used to define classes, functions and protocols that can work with any type.
+
+```python
+from typing import Generic, TypeVar
+
+T = TypeVar("T")
+
+class Box(Generic[T]):
+    def __init__(self, item: T) -> None:
+        self.item = item
+
+    def get(self) -> T:
+        return self.item
+
+box = Box("hello")
+
+# the above code is equivalent to the following code
+
+class Box_2(Generic[str]):
+    def __init__(self, item: str) -> None:
+        self.item = item
+
+    def get(self) -> str:
+        return self.item
+
+box_2 = Box_2("hello")
+```
+
+### Functions
+
+Functions or callables can be annotated with type hints.
+using `collections.abc.Callable` or `typing.Callable`.
+
+
+where  `Callable[[int], str]` signifies a function that takes a single parameter of type `int` and returns a `str`.
+
+```python
+from typing import Callable
+from collections.abc import Callable, Awaitable
+
+def feed(cat: Callable[[str, int], str]) -> None:
+    cat("fish", 3)
+
+def async_feed(cat: Callable[[str, int], Awaitable[str]]) -> None:
+    await cat("fish", 3)
+```
+
+`Callable` must always be subscripted with exactly two values.
+
+- The first value is a list of the function's parameters. or it can be
+    - `...` if the function takes a variable number of arguments.
+    - `ParamSpec` if the function is defined with `typing.ParamSpec`.
+    - `Concatenate` if the function is defined with `typing.Concatenate`.
+- The second value is the function's return type (always a single value).
+
+
+some examples:
+
+```python
+from typing import Callable, Iterable, Union, Optional, ParamSpec, Concatenate,TypeAlias
+
+callback: Callable[[int, str], None]
+items: Iterable[Union[int, str]]
+maybe_string: Optional[str]
+
+def eat(food: str, amount: int) -> str:
+    ...
+
+# the following are all equivalent
+eat: Callable[[str, int], str]
+eat: Callable[..., str]
+eat: Callable[[ParamSpec('T'), ParamSpec('U')], str]
+eat: Callable[[Concatenate[str, int]], str]
+
+
+ReturnType: TypeAlias = Optional[Union[str, bytes]]
+
+def get_data() -> ReturnType:
+    ...
+
+```
+
+### Classes
+
+
+```python
+
+class A:
+    def __init__(self, x: int) -> None:
+        self.x = x
+
+a = A(1)
+
+class B:
+    # As in Python generally, a variable defined in the class body can be used as a class or an instance variable. 
+    # mypy!
+    x: int
+
+b = B()
+b.x = 3
+```
+
+```python
+from typing import ClassVar
+
+class C:
+    x: ClassVar[int] = 0
+
+C.x += 2
+
+c = C()
+c.x = 3 # Error: Cannot assign to class variable "x" via instance
+```
