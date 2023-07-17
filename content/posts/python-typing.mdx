@@ -197,7 +197,7 @@ from collections.abc import Callable, Awaitable
 def feed(cat: Callable[[str, int], str]) -> None:
     cat("fish", 3)
 
-def async_feed(cat: Callable[[str, int], Awaitable[str]]) -> None:
+async def async_feed(cat: Callable[[str, int], Awaitable[str]]) -> None:
     await cat("fish", 3)
 ```
 
