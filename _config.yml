@@ -106,6 +106,7 @@ social_preview_image: # string, local or CORS resources
 toc: true
 comments.active: true
 comments:
+
   # Global switch for the post comment system. Keeping it empty means disabled.
   provider: utterances
   # The provider options are as follows:
@@ -113,7 +114,7 @@ comments:
     shortname: # fill with the Disqus shortname. › https://help.disqus.com/en/articles/1717111-what-s-a-shortname
   # utterances settings › https://utteranc.es/
   utterances:
-    repo: khalelborai/khalelborai.github.io # fill with the repo for Utterances to store comments
+    repo: khalidelborai/khalidelborai.github.io # fill with the repo for Utterances to store comments
     issue_term: title # optional, default to 'pathname'
     label: "Comments"
     theme: "dark-blue"
