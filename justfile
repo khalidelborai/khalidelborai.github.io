@@ -4,7 +4,6 @@ title := "$POST_TITLE"
 alias help := default
 
 default:
-    @echo {{title}}
     @just --list --justfile {{justfile()}} --unsorted
 
 
