@@ -115,3 +115,12 @@ We'll start with a simple operation:
 Polars is a powerful tool that can handle vast datasets with ease, thanks to its speed and efficiency.
 While Pandas is a well-established library with a vast ecosystem, Polars is quickly gaining traction with its impressive performance improvements.
 Whether you're working with small or large datasets, Polars is a worthy contender that can help you process data faster and more efficiently.
+
+
+## References
+
+- [Polars](https://docs.pola.rs/)
+- [Pandas](https://pandas.pydata.org/)
+- [Data Set](https://datahub.io/collections/air-pollution)
+
+## Code
