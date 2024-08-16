@@ -19,7 +19,7 @@ Recently, both Pandas and Polars have had significant updates boasting impressiv
 Pandas 2.0 now supports Apache Arrow, pushing the limits of its capabilities.
 Meanwhile, Polars, written in Rust, promises enhanced performance that's turning heads everywhere
 
-Let's dive into a head-to-head comparison, examining these two titans in speed, syntax, and usability using a dataset from a threat intelligence platform.
+Let's dive into a head-to-head comparison, examining these two titans in speed, syntax, and usability.
 
 ## Speed
 
