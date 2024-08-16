@@ -153,6 +153,50 @@ We'll start with a simple operation:
 
   Polars is approximately 4 times faster than Pandas in this operation.
 
+  - Save to CSV
+
+  #### Pandas
+
+  ```python
+  from pandas import read_csv
+  import pyperf
+
+  runner = pyperf.Runner()
+
+  def save_rename_col(filename):
+      df = read_csv(filename)
+      col = 'Daily Max 8-hour CO Concentration'
+      df = df.rename(columns={col: 'CO'})
+      df.to_csv('data/dataset_renamed.csv')
+
+  runner.bench_func('save_rename_col', save_rename_col, 'data/dataset.csv')
+  ```
+  `save_rename_col: Mean +- std dev: 4.72 ms +- 1.11 ms`
+
+  #### Polars
+
+  ```python
+  import polars as pl
+  import pyperf
+
+
+  runner = pyperf.Runner()
+
+  def save_rename_col(filename):
+      df = pl.read_csv(filename)
+      col = 'Daily Max 8-hour CO Concentration'
+      df = df.with_columns(pl.col(col).alias('CO'))
+      df.write_csv('data/dataset_renamed_polars.csv')
+
+  runner.bench_func('save_rename_col', save_rename_col, 'data/dataset.csv')
+  ```
+  `save_rename_col: Mean +- std dev: 1.49 ms +- 1.13 ms`
+
+  - **Pandas**: 4.72 milliseconds on average
+  - **Polars**: 1.49 milliseconds on average
+
+  Polars is approximately 3 times faster than Pandas in this operation.
+
 ## Conclusion
 
 Polars is a powerful tool that can handle vast datasets with ease, thanks to its speed and efficiency.
