@@ -29,7 +29,7 @@ We'll start with a simple operation:
 
 - reading a CSV file and filtering rows based on a condition.
 
-  #### Pandas
+  #### 01-Pandas
 
   ```python
   from pandas import read_csv
@@ -46,7 +46,7 @@ We'll start with a simple operation:
   `load_dataset: Mean +- std dev: 1.75 ms +- 0.31 ms`
 
 
-  #### Polars
+  #### 01-Polars
 
   ```python
   import polars as pl
@@ -70,7 +70,7 @@ We'll start with a simple operation:
 
 - Filtering the data
 
-  #### Pandas
+  #### 02-Pandas
 
   ```python
   from pandas import read_csv
@@ -87,7 +87,7 @@ We'll start with a simple operation:
   ```
   `filter_dataset: Mean +- std dev: 2.32 ms +- 0.47 ms`
 
-  #### Polars
+  #### 02-Polars
 
   ```python
   import polars as pl
@@ -111,7 +111,7 @@ We'll start with a simple operation:
 
 - Rename Column
 
-  #### Pandas
+  #### 03-Pandas
 
   ```python
   from pandas import read_csv
@@ -129,7 +129,7 @@ We'll start with a simple operation:
   ```
   `rename_col: Mean +- std dev: 2.11 ms +- 0.39 ms`
 
-  #### Polars
+  #### 03-Polars
 
   ```python
   import polars as pl
@@ -155,7 +155,7 @@ We'll start with a simple operation:
 
 - Save to CSV
 
-  #### Pandas
+  #### 04-Pandas
 
   ```python
   from pandas import read_csv
@@ -173,7 +173,7 @@ We'll start with a simple operation:
   ```
   `save_rename_col: Mean +- std dev: 4.72 ms +- 1.11 ms`
 
-  #### Polars
+  #### 04-Polars
 
   ```python
   import polars as pl
