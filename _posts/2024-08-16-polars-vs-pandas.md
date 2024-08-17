@@ -197,12 +197,155 @@ We'll start with a simple operation:
 
   Polars is approximately 3 times faster than Pandas in this operation.
 
+
+- All Together
+
+  #### 05-Pandas
+
+  ```python
+  import pandas as pd
+  from typing import Dict,Union
+  import pyperf
+
+  runner = pyperf.Runner()
+
+  reanmed = {
+      'Date': 'date',
+      'Source': 'source',
+      'Site ID': 'site_id',
+      'POC': 'poc',
+      'Daily Max 8-hour CO Concentration': 'co',
+      'Units': 'units',
+      'Daily AQI Value': 'aqi',
+      'Local Site Name': 'local_site_name',
+      'Daily Obs Count': 'daily_obs_count',
+      'Percent Complete': 'percent_complete',
+      'AQS Parameter Code': 'aqs_parameter_code',
+      'AQS Parameter Description': 'aqs_parameter_description',
+      'Method Code': 'method_code',
+      'CBSA Code': 'cbsa_code',
+      'CBSA Name': 'cbsa_name',
+      'State FIPS Code': 'state_fips_code',
+      'State': 'state',
+      'County FIPS Code': 'county_fips_code',
+      'County': 'county',
+      'Site Latitude': 'site_latitude',
+      'Site Longitude': 'site_longitude'
+  }
+
+
+  def read_csv(filename: str) -> pd.DataFrame:
+      df = pd.read_csv(filename)
+      return df
+
+
+  def rename_cols(df: pd.DataFrame, columns: Dict[str,str]) -> pd.DataFrame:
+      df = df.rename(columns=columns)
+      return df
+
+  def filter_cols(df: pd.DataFrame) -> Union[pd.DataFrame,pd.Series]:
+      return df[df['co'] > 0.5]
+
+  def save_csv(df: pd.DataFrame, filename: str) -> None:
+      df.to_csv(filename)
+
+
+  def process(filename: str) -> None:
+      df = read_csv(filename)
+      df = rename_cols(df, reanmed)
+      df = filter_cols(df)
+      if isinstance(df, pd.DataFrame):
+          save_csv(df, 'data/dataset_renamed_pandas.csv')
+
+
+  runner.bench_func('process', process, 'data/dataset.csv')
+  ```
+  `process: Mean +- std dev: 5.40 ms +- 0.63 ms`
+
+  #### 05-Polars
+
+  ```python
+  from typing import Dict
+  import pyperf
+  import polars as pl
+
+  runner = pyperf.Runner()
+
+  reanmed = {
+      'Date': 'date',
+      'Source': 'source',
+      'Site ID': 'site_id',
+      'POC': 'poc',
+      'Daily Max 8-hour CO Concentration': 'co',
+      'Units': 'units',
+      'Daily AQI Value': 'aqi',
+      'Local Site Name': 'local_site_name',
+      'Daily Obs Count': 'daily_obs_count',
+      'Percent Complete': 'percent_complete',
+      'AQS Parameter Code': 'aqs_parameter_code',
+      'AQS Parameter Description': 'aqs_parameter_description',
+      'Method Code': 'method_code',
+      'CBSA Code': 'cbsa_code',
+      'CBSA Name': 'cbsa_name',
+      'State FIPS Code': 'state_fips_code',
+      'State': 'state',
+      'County FIPS Code': 'county_fips_code',
+      'County': 'county',
+      'Site Latitude': 'site_latitude',
+      'Site Longitude': 'site_longitude'
+  }
+
+
+  def read_csv(filename: str) -> pl.DataFrame:
+      df = pl.read_csv(filename)
+      return df
+
+
+  def rename_cols(df: pl.DataFrame, columns: Dict[str,str]) -> pl.DataFrame:
+      df = df.with_columns([pl.col(col).alias(new_col) for col,new_col in columns.items()])
+      return df
+
+  def filter_cols(df: pl.DataFrame) -> pl.DataFrame:
+      return df.filter(pl.col('co') > 0.5)
+
+  def save_csv(df: pl.DataFrame, filename: str) -> None:
+      df.write_csv(filename)
+
+
+  def process(filename: str) -> None:
+      df = read_csv(filename)
+      df = rename_cols(df, reanmed)
+      df = filter_cols(df)
+      save_csv(df, 'data/dataset_renamed_polars.csv')
+
+
+  runner.bench_func('process', process, 'data/dataset.csv')
+  ```
+  `process: Mean +- std dev: 3.46 ms +- 2.30 ms`
+
+  - **Pandas**: 5.40 milliseconds on average
+  - **Polars**: 3.46 milliseconds on average
+
+  Polars is approximately 1.5 times faster than Pandas in this operation.
+
+
+
 ## Conclusion
 
 Polars is a powerful tool that can handle vast datasets with ease, thanks to its speed and efficiency.
 While Pandas is a well-established library with a vast ecosystem, Polars is quickly gaining traction with its impressive performance improvements.
 Whether you're working with small or large datasets, Polars is a worthy contender that can help you process data faster and more efficiently.
 
+
+### Benchmark Results
+
+| Operation                                        | Pandas (ms)       | Polars (ms)       | Speedup          |
+|--------------------------------------------------|-------------------|-------------------|------------------|
+| Reading CSV file                                 | 1.75              | 0.541             | ~3.2x faster     |
+| Filtering rows based on condition                | 2.32              | 1.06              | ~2.2x faster     |
+| Renaming a column                                | 2.11              | 0.567             | ~3.7x faster     |
+| Saving to CSV                                    | 4.72              | 1.49              | ~3.2x faster     |
+| Combined dataset processing operations           | 5.40              | 3.46              | ~1.5x faster     |
 
 ## References
 
