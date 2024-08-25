@@ -4,7 +4,7 @@ title: Polars vs Pandas
 date: 2024-08-16 23:03 +0300
 categories: data rust python
 tags: data rust python polars pandas
-pin: true
+pin: false
 description: A comparison between Polars and Pandas
 ---
 
