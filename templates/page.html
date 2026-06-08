@@ -27,9 +27,26 @@
 
 {%- block head -%}
 <script src="{{ get_url(path='js/share.js', cachebust=true) }}" defer></script>
+<script src="{{ get_url(path='js/reading-progress.js', cachebust=true) }}" defer></script>
 {%- if config.extra.engagement.api %}
 <script src="{{ get_url(path='js/engagement.js', cachebust=true) }}" defer></script>
 {%- endif %}
+{#- JSON-LD structured data (rich results + nicer link unfurls). -#}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "{{ page.title | replace(from='"', to='\\"') }}",
+  {%- if page.description %}"description": "{{ page.description | striptags | replace(from='"', to='\\"') }}",{% endif %}
+  "url": "{{ page.permalink | safe }}",
+  "mainEntityOfPage": "{{ page.permalink | safe }}",
+  "datePublished": "{{ page.date }}",
+  {%- if page.updated %}"dateModified": "{{ page.updated }}",{% else %}"dateModified": "{{ page.date }}",{% endif %}
+  {%- if page.taxonomies.tags %}"keywords": "{{ page.taxonomies.tags | join(sep=', ') }}",{% endif %}
+  "author": { "@type": "Person", "name": "{{ config.author }}", "url": "{{ config.base_url }}/about/" },
+  "publisher": { "@type": "Person", "name": "{{ config.author }}" }
+}
+</script>
 {%- endblock -%}
 
 {%- block main -%}
@@ -37,6 +54,31 @@
 <article class="post content">
     {{ post_macros::header(page=page, heading="h1") | indent | safe }}
 {%- endfilter %}{%- endfilter %}
+
+{#- "Updated" line (shown when the post sets `updated` in front matter). -#}
+{%- if page.updated and page.updated != page.date -%}
+<p class="post-updated">Updated {{ page.updated | date(format="%Y.%m.%d") }}</p>
+{%- endif -%}
+
+{#- Table of contents (opt-in via `[extra] toc = true`). -#}
+{%- if page.extra.toc | default(value=false) and page.toc -%}
+<nav class="toc" aria-label="Table of contents">
+    <p class="toc__label">on this page</p>
+    <ol>
+    {%- for h in page.toc %}
+        <li><a href="{{ h.permalink | safe }}">{{ h.title }}</a>
+        {%- if h.children %}
+            <ol>
+            {%- for c in h.children %}
+                <li><a href="{{ c.permalink | safe }}">{{ c.title }}</a></li>
+            {%- endfor %}
+            </ol>
+        {%- endif %}
+        </li>
+    {%- endfor %}
+    </ol>
+</nav>
+{%- endif -%}
 
 {#- Series navigation box (auto-injected for posts in a series). -#}
 {%- set series_list = page.taxonomies.series | default(value=[]) -%}
@@ -98,6 +140,32 @@
 
 {%- filter indent -%}{%- filter indent %}
 </article>
+{#- Related posts: others sharing this post's first tag (up to 3). -#}
+{%- set tag_list = page.taxonomies.tags | default(value=[]) -%}
+{%- if tag_list | length > 0 -%}
+{%- set first_tag = tag_list.0 | slugify -%}
+{%- set_global related = [] -%}
+{%- set tags_tax = get_taxonomy(kind="tags") -%}
+{%- for term in tags_tax.items -%}
+{%- if term.slug == first_tag -%}{%- set_global related = term.pages -%}{%- endif -%}
+{%- endfor -%}
+{%- set_global rel_count = 0 -%}
+{%- for p in related -%}{%- if p.permalink != page.permalink -%}{%- set_global rel_count = rel_count + 1 -%}{%- endif -%}{%- endfor -%}
+{%- if rel_count > 0 -%}
+<aside class="related" aria-label="Related posts">
+    <h2>Related</h2>
+    <ul>
+    {%- set_global shown = 0 -%}
+    {%- for p in related -%}
+        {%- if p.permalink != page.permalink and shown < 3 -%}
+        <li><a href="{{ p.permalink | safe }}">{{ p.title }}</a> <time>{{ p.date | date(format="%Y.%m.%d") }}</time></li>
+        {%- set_global shown = shown + 1 -%}
+        {%- endif -%}
+    {%- endfor -%}
+    </ul>
+</aside>
+{%- endif -%}
+{%- endif -%}
 {%- if page.lower or page.higher %}
 <nav class="post-navigation">
     <header class="post-navigation-title">

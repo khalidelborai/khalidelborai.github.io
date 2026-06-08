@@ -27,6 +27,10 @@ render_emoji = true
 bottom_footnotes = true
 lazy_async_image = true
 github_alerts = true
+# Outbound links open in a new tab, don't pass referrer, and aren't endorsed.
+external_links_target_blank = true
+external_links_no_follow = true
+external_links_no_referrer = true
 
 [markdown.highlighting]
 # Bundled with Terminus; classic terminal-style palette.
