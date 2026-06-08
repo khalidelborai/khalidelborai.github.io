@@ -68,8 +68,11 @@ socials = [
 enable = true
 # Pagefind search compiles a WebAssembly module at runtime, which requires
 # 'wasm-unsafe-eval'. 'self' keeps every script same-origin (no inline JS).
+# static.cloudflareinsights.com / cloudflareinsights.com allow the Cloudflare
+# Web Analytics beacon that the proxied domain auto-injects (cookieless).
 allowed_domains = [
-    { directive = "script-src", domains = ["'self'", "'wasm-unsafe-eval'"] },
+    { directive = "script-src", domains = ["'self'", "'wasm-unsafe-eval'", "static.cloudflareinsights.com"] },
+    { directive = "connect-src", domains = ["'self'", "cloudflareinsights.com"] },
 ]
 
 [extra.responsive_images]
