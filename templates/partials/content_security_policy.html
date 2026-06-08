@@ -51,6 +51,13 @@
         {%- set allowed_domains = allowed_domains | concat(with=gi_script) | concat(with=gi_frame) | concat(with=gi_connect) | concat(with=gi_style) -%}
     {%- endif -%}
 
+    {#- SITE OVERRIDE: privacy YouTube embeds (youtube-nocookie iframe). Allow
+        the frame only on posts with `extra.embeds = true`. -#}
+    {%- if page.extra.embeds | default(value=false) or section.extra.embeds | default(value=false) -%}
+        {%- set yt_frame = load_data(literal=`{"directive": "frame-src", "domains": ["https://www.youtube-nocookie.com"]}`, format="json") -%}
+        {%- set allowed_domains = allowed_domains | concat(with=yt_frame) -%}
+    {%- endif -%}
+
     {%- set extra_domains = config.extra.content_security_policy.allowed_domains -%}
     {%- set allowed_domains = allowed_domains | concat(with=extra_domains) -%}
 

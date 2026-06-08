@@ -1,0 +1,7 @@
+{#- Self-hosted HTML5 video (same-origin, no CSP change). Usage:
+    {{ video(src="/media/demo.mp4", poster="/media/demo.jpg") }} -#}
+<div class="embed embed--video">
+  <video controls preload="metadata"{% if poster %} poster="{{ poster }}"{% endif %}>
+    <source src="{{ src }}" type="{{ type | default(value='video/mp4') }}">
+  </video>
+</div>

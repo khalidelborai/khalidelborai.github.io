@@ -47,3 +47,6 @@ else
   npx -y pagefind@1 --site "$out"
 fi
 echo "postbuild: built Pagefind search index in $out/pagefind/"
+
+# Generate /feed.json (JSON Feed) and /llms.txt from the posts.
+python3 scripts/gen-extra.py "$out"

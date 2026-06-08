@@ -1,0 +1,10 @@
+{#- Privacy-friendly YouTube embed. Usage:
+    {{ youtube(id="dQw4w9WgXcQ", title="optional") }}
+    Requires `[extra] embeds = true` in the post (scopes the CSP frame-src). -#}
+<div class="embed embed--video">
+  <iframe src="https://www.youtube-nocookie.com/embed/{{ id }}"
+    title="{{ title | default(value='YouTube video') }}"
+    loading="lazy" allowfullscreen
+    allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+    referrerpolicy="strict-origin-when-cross-origin"></iframe>
+</div>
