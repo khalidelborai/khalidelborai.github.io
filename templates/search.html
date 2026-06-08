@@ -27,7 +27,7 @@ Search | {{ config.title }}
 {%- filter indent -%}{%- filter indent -%}
 <article class="post content">
     {{ section.content | indent | safe }}
-    <div id="search"></div>
+    <div id="search"{% if config.extra.engagement.api %} data-engagement-api="{{ config.extra.engagement.api }}"{% endif %}></div>
 </article>
 {%- endfilter -%}{%- endfilter -%}
 {%- endblock -%}

@@ -14,5 +14,11 @@
     { "binding": "ENGAGEMENT", "id": "25ccbbd4e84f47d1ab19feb2e837f789" }
   ],
 
+  // Event stream (referrers, scroll depth, search queries). Query via the
+  // Cloudflare GraphQL/SQL Analytics API or the dashboard.
+  "analytics_engine_datasets": [
+    { "binding": "AE", "dataset": "borai_events" }
+  ],
+
   "observability": { "enabled": true }
 }

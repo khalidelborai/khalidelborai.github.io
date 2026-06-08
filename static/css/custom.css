@@ -168,6 +168,24 @@
 }
 .related time { color: var(--footnote-color, rgba(255, 255, 255, 0.5)); font-size: 0.85em; white-space: nowrap; }
 
+/* --- Popular posts (home) --- */
+.popular {
+  margin: 1.5rem 0 2rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--accent-color) 40%, transparent);
+  border-radius: var(--radius, 6px);
+  background: color-mix(in srgb, var(--text-color) 3%, var(--background-color));
+}
+.popular h2 { margin: 0 0 0.4rem; font-size: 0.95em; }
+.popular ol { margin: 0; padding-left: 1.3rem; }
+.popular li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.12rem 0;
+}
+.popular__views { color: var(--footnote-color, rgba(255, 255, 255, 0.5)); font-size: 0.82em; white-space: nowrap; }
+
 /* --- Media embeds (responsive 16:9) --- */
 .embed--video {
   position: relative;
