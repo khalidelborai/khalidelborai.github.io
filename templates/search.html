@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{%- block title -%}
+Search | {{ config.title }}
+{%- endblock -%}
+
+{%- block description -%}
+<meta name="description" content="Search {{ config.title }}.">
+{%- endblock -%}
+
+{%- block robots -%}
+<meta name="robots" content="noindex, follow">
+{%- endblock -%}
+
+{# Pagefind assets live in /pagefind/, generated after `zola build` by
+   scripts/postbuild.sh. Plain absolute paths (no cachebust) because the files
+   don't exist at template-render time. Init is an external script so it passes
+   the site's script-src 'self' CSP (no inline JS allowed in production). #}
+{%- block head -%}
+<link rel="stylesheet" href="/pagefind/pagefind-ui.css">
+<link rel="stylesheet" href="{{ get_url(path='css/search.css', cachebust=true) }}">
+<script src="/pagefind/pagefind-ui.js" defer></script>
+<script src="{{ get_url(path='js/search.js', cachebust=true) }}" defer></script>
+{%- endblock -%}
+
+{%- block main -%}
+{%- filter indent -%}{%- filter indent -%}
+<article class="post content">
+    {{ section.content | indent | safe }}
+    <div id="search"></div>
+</article>
+{%- endfilter -%}{%- endfilter -%}
+{%- endblock -%}

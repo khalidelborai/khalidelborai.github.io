@@ -1,0 +1,77 @@
+# Zola configuration — https://www.getzola.org/documentation/getting-started/configuration/
+# Theme: terminus (https://github.com/ebkalderon/terminus)
+
+base_url = "https://blog.borai.dev"
+title = "Khalid Elborai"
+description = "Khalid Elborai — Technical Lead, Software Engineer, and Open Source Contributor."
+author = "Khalid Elborai"
+theme = "terminus"
+
+compile_sass = true
+generate_feeds = true
+# NOTE: minify_html stays OFF — Zola's minifier drops optional <html>/<body>
+# tags, which breaks Pagefind's HTML parser (indexes 0 pages). gzip already
+# compresses the whitespace, so the loss is negligible.
+minify_html = false
+# Search is provided by Pagefind (post-build), not Zola's elasticlunr index.
+build_search_index = false
+
+taxonomies = [
+    { name = "tags", feed = true },
+    { name = "categories", feed = true, paginate_by = 5 },
+]
+
+[markdown]
+render_emoji = true
+bottom_footnotes = true
+lazy_async_image = true
+github_alerts = true
+
+[markdown.highlighting]
+# Bundled with Terminus; classic terminal-style palette.
+style = "inline"
+extra_themes = ["syntaxes/monokai-classic.json"]
+theme = "monokai-classic"
+
+[extra]
+# Retro terminal duotone. Switcher lets you try tokyo-night, nord, gruvbox-dark,
+# catppuccin-*, synthwave-84, etc. without editing config.
+color_scheme = "terminus"
+color_scheme_switcher = true
+
+# On-brand for a Rust engineer; no image asset needed.
+favicon_emoji = "🦀"
+
+layout = "center"
+copy_button = true
+feed_icon = true
+show_default_author = false
+close_responsive_menu_on_resize = true
+
+main_menu = [
+    { name = "blog", url = "blog", trailing_slash = true },
+    { name = "projects", url = "projects", trailing_slash = true },
+    { name = "archive", url = "archive", trailing_slash = true },
+    { name = "tags", url = "tags", trailing_slash = true },
+    { name = "search", url = "search", trailing_slash = true },
+    { name = "about", url = "about", trailing_slash = true },
+    { name = "github", url = "https://github.com/khalidelborai", new_tab = true },
+]
+
+socials = [
+    { name = "github", url = "https://github.com/khalidelborai" },
+    { name = "x", url = "https://twitter.com/elborai_khalid" },
+    { name = "email", url = "mailto:khalidelborai@hotmail.com" },
+]
+
+[extra.content_security_policy]
+enable = true
+# Pagefind search compiles a WebAssembly module at runtime, which requires
+# 'wasm-unsafe-eval'. 'self' keeps every script same-origin (no inline JS).
+allowed_domains = [
+    { directive = "script-src", domains = ["'self'", "'wasm-unsafe-eval'"] },
+]
+
+[extra.responsive_images]
+widths = [640, 784, 1280, 1920, 2560]
+fallback_width = 1280

@@ -1,0 +1,30 @@
+/* Re-skin the Pagefind Default UI to match the active Terminus colour scheme.
+   Everything is wired to the theme's own CSS variables (set per data-theme on
+   :root), so the search box automatically follows the colour-scheme switcher
+   instead of shipping Pagefind's default light-mode look. */
+:root {
+  --pagefind-ui-scale: 0.9;
+  --pagefind-ui-primary: var(--accent-color);
+  --pagefind-ui-text: var(--text-color);
+  /* A surface a touch lighter than the page so the field reads as raised. */
+  --pagefind-ui-background: color-mix(in srgb, var(--text-color) 5%, var(--background-color));
+  --pagefind-ui-border: color-mix(in srgb, var(--text-color) 18%, transparent);
+  --pagefind-ui-tag: color-mix(in srgb, var(--text-color) 12%, transparent);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: var(--radius, 6px);
+  /* Inherit Fira Code → results read like the rest of the terminal theme. */
+  --pagefind-ui-font: inherit;
+}
+
+/* Keep the highlighted match legible on a dark background. */
+.pagefind-ui mark {
+  background: color-mix(in srgb, var(--accent-color) 30%, transparent);
+  color: var(--text-color);
+  padding: 0 0.1em;
+}
+
+/* Result titles use the theme accent, like other links. */
+.pagefind-ui__result-title a,
+.pagefind-ui__result-link {
+  color: var(--accent-color);
+}

@@ -1,61 +1,46 @@
-# Chirpy Starter
+# blog.borai.dev
 
-[![Gem Version](https://img.shields.io/gem/v/jekyll-theme-chirpy)][gem]&nbsp;
-[![GitHub license](https://img.shields.io/github/license/cotes2020/chirpy-starter.svg?color=blue)][mit]
+Personal site of **Khalid Elborai** — built with the [Zola](https://www.getzola.org)
+static site generator and the [Terminus](https://github.com/ebkalderon/terminus)
+theme. Deploys to GitHub Pages at [blog.borai.dev](https://blog.borai.dev).
 
-When installing the [**Chirpy**][chirpy] theme through [RubyGems.org][gem], Jekyll can only read files in the folders
-`_data`, `_layouts`, `_includes`, `_sass` and `assets`, as well as a small part of options of the `_config.yml` file
-from the theme's gem. If you have ever installed this theme gem, you can use the command
-`bundle info --path jekyll-theme-chirpy` to locate these files.
+## Develop
 
-The Jekyll team claims that this is to leave the ball in the user’s court, but this also results in users not being
-able to enjoy the out-of-the-box experience when using feature-rich themes.
-
-To fully use all the features of **Chirpy**, you need to copy the other critical files from the theme's gem to your
-Jekyll site. The following is a list of targets:
-
-```shell
-.
-├── _config.yml
-├── _plugins
-├── _tabs
-└── index.html
-```
-
-To save you time, and also in case you lose some files while copying, we extract those files/configurations of the
-latest version of the **Chirpy** theme and the [CD][CD] workflow to here, so that you can start writing in minutes.
-
-## Prerequisites
-
-Follow the instructions in the [Jekyll Docs](https://jekyllrb.com/docs/installation/) to complete the installation of
-the basic environment. [Git](https://git-scm.com/) also needs to be installed.
-
-## Installation
-
-Sign in to GitHub and [**use this template**][use-template] to generate a brand new repository and name it
-`USERNAME.github.io`, where `USERNAME` represents your GitHub username.
-
-Then clone it to your local machine and run:
+Requires [Zola](https://www.getzola.org/documentation/getting-started/installation/)
+≥ 0.22 (`brew install zola`) and the theme submodule:
 
 ```console
-$ bundle
+git submodule update --init --recursive   # first checkout only
+just serve                                 # http://127.0.0.1:1111 with live reload
 ```
 
-## Usage
+Other recipes (`just` to list all):
 
-Please see the [theme's docs](https://github.com/cotes2020/jekyll-theme-chirpy#documentation).
+| Recipe              | Action                                                     |
+| ------------------- | ---------------------------------------------------------- |
+| `just serve`        | Dev server with live reload + drafts (no search index)     |
+| `just build`        | Production build → `./public` (prune + Pagefind index)     |
+| `just preview`      | Build, then serve `./public` on :8000 — search works here  |
+| `just check`        | Validate content, templates, and links                     |
+| `just post "Title"` | Scaffold `content/blog/<date>-<slug>.md`                   |
 
-## Contributing
+Full-text search is powered by [Pagefind](https://pagefind.app) (built in
+`scripts/postbuild.sh`). It indexes the generated HTML, so it only works on the
+built output — use `just preview`, not `just serve`, to test it locally.
 
-The contents of this repository are automatically updated when new releases are made to the [main repository][chirpy].  
-If you have problems using it, or would like to participate in improving it, please go to the main repository for feedback!
+## Deploy
+
+Push to `main` → `.github/workflows/pages-deploy.yml` installs Zola, builds, and
+publishes to GitHub Pages. No manual step.
+
+## Theme & config
+
+- Theme is vendored as a git submodule at `themes/terminus`; update with
+  `git submodule update --remote themes/terminus`.
+- Site identity, menu, socials, and color scheme live in `config.toml`.
+- The previous Jekyll/Chirpy site is preserved on the `backup/jekyll-chirpy`
+  branch and under `_archive/` — see `_archive/README.md`.
 
 ## License
 
-This work is published under [MIT][mit] License.
-
-[gem]: https://rubygems.org/gems/jekyll-theme-chirpy
-[chirpy]: https://github.com/cotes2020/jekyll-theme-chirpy/
-[use-template]: https://github.com/cotes2020/chirpy-starter/generate
-[CD]: https://en.wikipedia.org/wiki/Continuous_deployment
-[mit]: https://github.com/cotes2020/chirpy-starter/blob/master/LICENSE
+Content © Khalid Elborai. Theme under [MIT](https://github.com/ebkalderon/terminus/blob/master/LICENSE).
