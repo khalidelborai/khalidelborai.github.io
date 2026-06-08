@@ -8,11 +8,13 @@ framed = true
 
 # About
 
-I'm **Khalid Elborai** — Technical Lead, Software Engineer, and open-source
-contributor. I like sharing what I learn and learning from others.
+I'm **Khalid Elborai** — CTO at [Buguard](https://buguard.io), where I spend my
+days doing rusty things (and, when it's called for, rusting things). Engineer and
+open-source contributor who likes sharing what I learn and learning from others.
 
-Most of my day is spent in **Rust** and the fast, modern tooling around it. I
-also work in security and occasionally write about data engineering.
+Most of my day is **Rust** and the fast, modern tooling around it. Buguard is a
+security company, so I live in that world too — and I still write about data
+engineering now and then.
 
 ## Elsewhere
 
