@@ -1,0 +1,4 @@
+<pre class="mermaid">{{ body }}</pre>
+{%- if page.extra.mermaid | default(value=false) or section.extra.mermaid | default(value=false) -%}
+<script src="{{ get_url(path='js/mermaid-render.js', cachebust=true) }}" defer></script>
+{%- endif -%}

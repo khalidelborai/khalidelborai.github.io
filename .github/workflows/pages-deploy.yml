@@ -45,10 +45,13 @@ jobs:
           sudo mv zola /usr/local/bin/zola
           zola --version
 
+      - name: Vendor build-time assets
+        run: bash scripts/vendor.sh
+
       - name: Build site
         run: zola build
 
-      - name: Prune unused assets
+      - name: Prune + index
         run: bash scripts/postbuild.sh public
 
       - name: Upload site artifact

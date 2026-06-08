@@ -4,6 +4,9 @@
 # Zola image processing cache
 /static/processed_images
 
+# Vendored at build time (scripts/vendor.sh) — too big to commit
+/static/js/mermaid.min.js
+
 # OS / editor
 .DS_Store
 .idea

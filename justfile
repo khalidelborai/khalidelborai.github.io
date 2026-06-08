@@ -10,14 +10,16 @@ default:
 serve:
     @zola serve --drafts
 
-# Build the production site into ./public (prune + Pagefind search index)
+# Build the production site into ./public (vendor + prune + Pagefind search index)
 build:
+    @bash scripts/vendor.sh
     @zola build
     @bash scripts/postbuild.sh public
 
 # Build with a localhost base_url + search index, then serve it. Use this to
 # test search locally (`just serve` has no index; prod base_url breaks CSP here).
 preview:
+    @bash scripts/vendor.sh
     @zola build --base-url http://127.0.0.1:8000
     @bash scripts/postbuild.sh public
     @echo "Built site with search → http://127.0.0.1:8000  (Ctrl+C to stop)"

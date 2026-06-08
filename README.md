@@ -28,6 +28,11 @@ Full-text search is powered by [Pagefind](https://pagefind.app) (built in
 `scripts/postbuild.sh`). It indexes the generated HTML, so it only works on the
 built output — use `just preview`, not `just serve`, to test it locally.
 
+Diagrams use [Mermaid](https://mermaid.js.org). Set `[extra] mermaid = true` in a
+post's front matter, then write `{% mermaid() %}…{% end %}`. The library is
+vendored at build time (`scripts/vendor.sh`) and only shipped to pages that use a
+diagram. See `CLAUDE.md` for the CSP details.
+
 ## Deploy
 
 Push to `main` → `.github/workflows/pages-deploy.yml` installs Zola, builds, and
