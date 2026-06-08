@@ -30,6 +30,16 @@
         {%- set allowed_domains = allowed_domains | concat(with=mermaid_style) -%}
     {%- endif -%}
 
+    {#- SITE OVERRIDE: asciinema-player runs a WASM-backed terminal in a blob
+        worker and styles it with inline CSS. Relax only on pages that opt in
+        with `extra.asciinema = true`. (script-src already allows
+        'wasm-unsafe-eval' globally, from Pagefind.) -#}
+    {%- if page.extra.asciinema | default(value=false) or section.extra.asciinema | default(value=false) -%}
+        {%- set a_style = load_data(literal=`{"directive": "style-src", "domains": ["'self'", "'unsafe-inline'"]}`, format="json") -%}
+        {%- set a_worker = load_data(literal=`{"directive": "worker-src", "domains": ["'self'", "blob:"]}`, format="json") -%}
+        {%- set allowed_domains = allowed_domains | concat(with=a_style) | concat(with=a_worker) -%}
+    {%- endif -%}
+
     {%- set extra_domains = config.extra.content_security_policy.allowed_domains -%}
     {%- set allowed_domains = allowed_domains | concat(with=extra_domains) -%}
 

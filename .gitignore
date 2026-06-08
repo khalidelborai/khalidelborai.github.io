@@ -4,8 +4,10 @@
 # Zola image processing cache
 /static/processed_images
 
-# Vendored at build time (scripts/vendor.sh) — too big to commit
+# Vendored at build time (scripts/vendor.sh) — fetched, not committed
 /static/js/mermaid.min.js
+/static/js/asciinema-player.min.js
+/static/css/asciinema-player.css
 
 # OS / editor
 .DS_Store

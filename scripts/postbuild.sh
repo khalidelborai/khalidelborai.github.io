@@ -32,6 +32,12 @@ if ! grep -rql "mermaid-render.js" "$out" --include='*.html' 2>/dev/null; then
   echo "postbuild: no diagrams found — pruned mermaid from $out/"
 fi
 
+# Likewise, ship the asciinema player only if a page embeds a cast.
+if ! grep -rql "asciinema-render.js" "$out" --include='*.html' 2>/dev/null; then
+  rm -f "$out/js/asciinema-player.min.js" "$out/js/asciinema-render.js" "$out/css/asciinema-player.css"
+  echo "postbuild: no casts found — pruned asciinema from $out/"
+fi
+
 # Build the static search index over the final HTML (Pagefind: Rust-based,
 # lazy-loaded at runtime, writes to $out/pagefind/). Prefer a local binary;
 # fall back to npx so CI needs no separate install step.

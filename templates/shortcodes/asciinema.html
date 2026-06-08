@@ -1,0 +1,18 @@
+{#- Embed an asciinema terminal recording. Usage:
+    {% asciinema(file="takween") %}                    -> /casts/takween.cast
+    {% asciinema(file="demo", autoplay=true, loop=true, speed=1.5) %}
+    Requires `[extra] asciinema = true` in the page front matter (loads the
+    player + relaxes the CSP only on opted-in pages). -#}
+<div class="asciinema-cast"
+     data-cast="/casts/{{ file }}.cast"
+     {%- if autoplay | default(value=false) %} data-autoplay="true"{% endif %}
+     {%- if loop | default(value=false) %} data-loop="true"{% endif %}
+     {%- if speed | default(value=false) %} data-speed="{{ speed }}"{% endif %}
+     {%- if poster | default(value=false) %} data-poster="{{ poster }}"{% endif %}
+     {%- if theme | default(value=false) %} data-theme="{{ theme }}"{% endif %}
+     {%- if cols | default(value=false) %} data-cols="{{ cols }}"{% endif %}
+     {%- if rows | default(value=false) %} data-rows="{{ rows }}"{% endif %}
+     {%- if idle | default(value=false) %} data-idle="{{ idle }}"{% endif %}></div>
+{%- if page.extra.asciinema | default(value=false) or section.extra.asciinema | default(value=false) -%}
+<script src="{{ get_url(path='js/asciinema-render.js', cachebust=true) }}" defer></script>
+{%- endif -%}

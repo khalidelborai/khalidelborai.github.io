@@ -33,6 +33,10 @@ post's front matter, then write `{% mermaid() %}…{% end %}`. The library is
 vendored at build time (`scripts/vendor.sh`) and only shipped to pages that use a
 diagram. See `CLAUDE.md` for the CSP details.
 
+Terminal recordings use [asciinema](https://asciinema.org). Set
+`[extra] asciinema = true`, put a `.cast` in `static/casts/`, and embed it with
+`{{ asciinema(file="name") }}`. Same vendor/prune/CSP handling as Mermaid.
+
 ## Deploy
 
 Push to `main` → `.github/workflows/pages-deploy.yml` installs Zola, builds, and

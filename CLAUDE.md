@@ -58,6 +58,19 @@ Moving parts:
 - `static/js/mermaid.min.js` — **not committed** (~3 MB). `scripts/vendor.sh` fetches it before every build (`just build`/`preview` and CI); `.gitignore` excludes it.
 - `scripts/postbuild.sh` **prunes the lib from the artifact unless a page actually uses a diagram** — so it costs nothing until you publish one.
 - `templates/partials/content_security_policy.html` is a **site override** of the theme partial: it adds `style-src 'unsafe-inline'` (for Mermaid's injected SVG `<style>`) **only on pages with `extra.mermaid = true`**, keeping the CSP strict everywhere else. Nonces aren't possible on a static host, so this scoped relaxation is the trade-off.
+- `static/js/mermaid-render.js` reads the theme's CSS variables and feeds them into Mermaid's `base` theme, so diagrams match the active color scheme (and the switcher).
+
+### Terminal recordings (asciinema)
+
+Opt-in per page, same shape as Mermaid. Set `[extra] asciinema = true`, drop a `.cast` file in `static/casts/`, and embed it (bodyless shortcode → `{{ }}`, not `{% %}`):
+
+```
+{{/* asciinema(file="takween", poster="npt:6", autoplay=false, loop=false, idle=2) */}}
+```
+
+`file` is the cast name under `static/casts/` (no extension). Moving parts mirror Mermaid: `templates/shortcodes/asciinema.html`, the external `static/js/asciinema-render.js` loader, vendored `asciinema-player.min.js`/`.css` (via `scripts/vendor.sh`, gitignored, pruned-if-unused), and the CSP override. asciinema-player is **WASM-backed and runs in a blob worker**, so the override adds `style-src 'unsafe-inline'` + `worker-src 'self' blob:` on opted-in pages (`'wasm-unsafe-eval'` is already global from Pagefind).
+
+**Cast gotcha:** keep recordings ASCII — wide/ambiguous-width Unicode glyphs (`✓ → ❯ —`) desync the emulator's grid from the font and characters overlap. `static/casts/takween.cast` is a hand-written sample.
 
 ## Gotchas
 
