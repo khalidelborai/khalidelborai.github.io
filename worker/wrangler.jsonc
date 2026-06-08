@@ -1,0 +1,18 @@
+{
+  "name": "borai-engagement",
+  "main": "src/index.js",
+  "compatibility_date": "2026-06-01",
+
+  // Same-origin route so the site can fetch "/api/...". borai.dev must be an
+  // active zone on your Cloudflare account (it is — the blog proxies through it).
+  "routes": [
+    { "pattern": "blog.borai.dev/api/*", "zone_name": "borai.dev" }
+  ],
+
+  // id filled in by `wrangler kv namespace create ENGAGEMENT`.
+  "kv_namespaces": [
+    { "binding": "ENGAGEMENT", "id": "25ccbbd4e84f47d1ab19feb2e837f789" }
+  ],
+
+  "observability": { "enabled": true }
+}

@@ -21,3 +21,7 @@
 
 # Playwright MCP artifacts
 .playwright-mcp/
+
+# Worker deps (installed by wrangler/npx)
+/worker/node_modules/
+/worker/.wrangler/

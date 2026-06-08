@@ -82,7 +82,7 @@ theme = "transparent_dark"
 # empty to keep the widgets off; set it (e.g. "/api") once worker/ is deployed
 # and routed at blog.borai.dev/api/*.
 [extra.engagement]
-api = ""
+api = "/api"
 
 [extra.content_security_policy]
 enable = true

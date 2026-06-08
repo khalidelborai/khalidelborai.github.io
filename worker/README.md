@@ -10,7 +10,7 @@ the site's frontend can call `/api/...` with no CORS/CSP cross-origin issues.
 cd worker
 npm i -g wrangler          # or use: npx wrangler ...
 
-# 1. create the KV namespace, then paste the printed id into wrangler.toml
+# 1. create the KV namespace, then paste the printed id into wrangler.jsonc
 wrangler kv namespace create ENGAGEMENT
 
 # 2. deploy (creates the worker + the blog.borai.dev/api/* route)
@@ -18,7 +18,7 @@ wrangler deploy
 ```
 
 `borai.dev` must already be an active zone on your Cloudflare account (it is —
-the blog is proxied through it). The route in `wrangler.toml` carves `/api/*`
+the blog is proxied through it). The route in `wrangler.jsonc` carves `/api/*`
 out of GitHub Pages and sends it to this Worker.
 
 ## Turn it on in the site
