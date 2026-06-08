@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{%- block title -%}
+{{ term.name | title }} | {{ config.title }}
+{%- endblock -%}
+
+{%- block feeds -%}
+    {%- if taxonomy.feed -%}
+        {%- for filename in config.feed_filenames -%}
+            {%- set feed_title = config.title ~ " | The '" ~ term.name ~ "' series" -%}
+            {%- set feed_filename = current_path ~ filename -%}
+            {{ feed_macros::link_alternate(filename=feed_filename, title=feed_title) }}
+        {% endfor -%}
+    {%- endif -%}
+{%- endblock -%}
+
+{%- block main -%}
+{%- filter indent -%}{%- filter indent -%}
+<h1>Series: {{ term.name }}</h1>
+{#- Oldest first (part 1 → N), instead of the taxonomy default (newest first). -#}
+{% for page in term.pages | sort(attribute="date") -%}
+{{ post_macros::excerpt(page=page) }}
+{% endfor -%}
+{%- endfilter -%}{%- endfilter -%}
+{%- endblock -%}

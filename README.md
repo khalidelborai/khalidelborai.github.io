@@ -37,6 +37,10 @@ Terminal recordings use [asciinema](https://asciinema.org). Set
 `[extra] asciinema = true`, put a `.cast` in `static/casts/`, and embed it with
 `{{ asciinema(file="name") }}`. Same vendor/prune/CSP handling as Mermaid.
 
+Group posts into a series by adding `series = ["name"]` under `[taxonomies]` in
+each post — a navigation box listing the ordered parts is injected automatically,
+and `/series/name/` lists them. See `CLAUDE.md`.
+
 ## Deploy
 
 Push to `main` → `.github/workflows/pages-deploy.yml` installs Zola, builds, and

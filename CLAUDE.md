@@ -72,6 +72,22 @@ Opt-in per page, same shape as Mermaid. Set `[extra] asciinema = true`, drop a `
 
 **Cast gotcha:** keep recordings ASCII — wide/ambiguous-width Unicode glyphs (`✓ → ❯ —`) desync the emulator's grid from the font and characters overlap. `static/casts/takween.cast` is a hand-written sample.
 
+### Post series
+
+Group related posts into an ordered series. In each post's front matter:
+
+```toml
+[taxonomies]
+series = ["takween"]
+```
+
+That's the whole opt-in — a **series navigation box auto-injects** between the title and body listing every part in order (current one highlighted). No shortcode needed.
+
+- **`series` is a taxonomy** (`config.toml`), so `/series/` and `/series/<name>/` index pages come free; `templates/series/single.html` overrides the term page to order parts oldest→newest.
+- The box itself lives in **`templates/page.html`** — a **site override** of the theme's post template (the box logic needs `get_taxonomy()`, which Zola exposes to templates but **not to shortcodes**, so it can't be a shortcode). If you ever update the theme, re-diff this file against `themes/terminus/templates/page.html`.
+- Parts are **ordered by `date`** (publish in sequence). `weight` is not sortable on taxonomy-term pages in Zola, so date is the ordering key.
+- Styling is in **`static/css/custom.css`**, loaded site-wide via `[extra] stylesheets` and keyed off the theme's CSS variables (follows the color scheme).
+
 ## Gotchas
 
 - **Posts use TOML front matter** (`+++ ... +++`), not Jekyll YAML. Categories/tags go in a `[taxonomies]` table, not top-level keys.

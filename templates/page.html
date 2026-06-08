@@ -1,0 +1,95 @@
+{# SITE OVERRIDE of the Terminus post template: identical to the theme's
+   page.html, plus an auto-injected "part of a series" box rendered between the
+   title and the body when the post sets `[taxonomies] series = [...]`. The box
+   logic lives here (not in a shortcode) because Zola only exposes
+   get_taxonomy() to templates, not shortcodes. #}
+{% extends "base.html" %}
+
+{%- block title -%}
+{{ page.title }} | {{ config.title }}
+{%- endblock -%}
+
+{%- block description -%}
+    {%- if page.description %}
+    <meta name="description" content="{{ page.description | markdown(inline=true) | striptags }}">
+    {%- elif page.summary %}
+    <meta name="description" content="{{ page.summary | linebreaksbr | replace(from="<br>", to=" ") | striptags | trim_end_matches(pat=".") | replace(from='"', to="&quot;") | replace(from="&", to="&amp;") | safe }}…">
+    {%- elif config.description %}
+    <meta name="description" content="{{ config.description }}">
+    {%- endif %}
+{%- endblock -%}
+
+{%- block translations -%}
+    {%- for translation in page.translations -%}
+    <link rel="alternate" hreflang="{{ translation.lang }}" href="{{ translation.permalink | safe }}">
+    {% endfor -%}
+{%- endblock -%}
+
+{%- block main -%}
+{%- filter indent -%}{%- filter indent -%}
+<article class="post content">
+    {{ post_macros::header(page=page, heading="h1") | indent | safe }}
+{%- endfilter %}{%- endfilter %}
+
+{#- Series navigation box (auto-injected for posts in a series). -#}
+{%- set series_list = page.taxonomies.series | default(value=[]) -%}
+{%- if series_list | length > 0 -%}
+{%- set series_name = series_list.0 -%}
+{%- set series_slug = series_name | slugify -%}
+{%- set_global series_parts = [] -%}
+{%- set_global series_url = "" -%}
+{%- set series_tax = get_taxonomy(kind="series") -%}
+{%- for term in series_tax.items -%}
+{%- if term.slug == series_slug -%}
+{%- set_global series_parts = term.pages | sort(attribute="date") -%}
+{%- set_global series_url = term.permalink -%}
+{%- endif -%}
+{%- endfor -%}
+<aside class="series-box" role="note" aria-label="Part of a series">
+    <div class="series-box__head">
+        <span class="series-box__label">series</span>
+        <a class="series-box__name" href="{{ series_url | safe }}">{{ series_name }}</a>
+        <span class="series-box__count">{{ series_parts | length }} part{{ series_parts | length | pluralize }}</span>
+    </div>
+    <ol class="series-box__list">
+    {%- for p in series_parts %}
+        {%- if p.permalink == page.permalink %}
+        <li class="is-current" aria-current="true"><span>{{ p.title }}</span></li>
+        {%- else %}
+        <li><a href="{{ p.permalink | safe }}">{{ p.title }}</a></li>
+        {%- endif %}
+    {%- endfor %}
+    </ol>
+</aside>
+{%- endif -%}
+
+{{ page.content | safe }}
+
+{%- filter indent -%}{%- filter indent %}
+</article>
+{%- if page.lower or page.higher %}
+<nav class="post-navigation">
+    <header class="post-navigation-title">
+        <h2>Read More Posts</h2>
+        <hr>
+    </header>
+    <div class="post-navigation-buttons">
+        {%- if page.lower %}
+        <a rel="next" href="{{ page.lower.permalink | safe }}" aria-label="Next article" aria-describedby="next-title">
+            &lt;&nbsp;[<span id="next-title">{{- page.lower.title | truncate(value=100, end="…") -}}</span>]
+        </a>
+        {%- endif %}
+        {%- if page.lower and page.higher %}
+        <span aria-hidden="true" role="separator">::</span>
+        {%- endif %}
+        {%- if page.higher %}
+        <a rel="prev" href="{{ page.higher.permalink | safe }}" aria-label="Prev article" aria-describedby="prev-title">
+            [<span id="prev-title">{{- page.higher.title | truncate(value=100, end="…") -}}</span>]&nbsp;&gt;
+        </a>
+        {%- endif %}
+    </div>
+</nav>
+{%- endif %}
+{% include "partials/comments.html" -%}
+{% endfilter %}{% endfilter %}
+{%- endblock -%}

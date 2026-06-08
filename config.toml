@@ -19,6 +19,7 @@ build_search_index = false
 taxonomies = [
     { name = "tags", feed = true },
     { name = "categories", feed = true, paginate_by = 5 },
+    { name = "series", feed = true },
 ]
 
 [markdown]
@@ -43,6 +44,8 @@ color_scheme_switcher = true
 favicon_emoji = "🦀"
 
 layout = "center"
+# Site-wide custom CSS (series box, etc.), loaded on top of the theme.
+stylesheets = ["css/custom.css"]
 copy_button = true
 feed_icon = true
 show_default_author = false
