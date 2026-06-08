@@ -98,6 +98,16 @@ All rendered by the `page.html` post template (so posts only).
 - **Share buttons** — X / Bluesky / LinkedIn / copy-link, rendered in `page.html`, no external deps. Copy-link handler is `static/js/share.js` (external → CSP-safe).
 - **`/now` and `/uses`** — personal-web pages (`content/now/`, `content/uses/`), sections like `/about`, linked in the nav.
 
+### Post extras & insights
+
+Rendered/managed mostly in the `page.html` / `index.html` overrides:
+- **Per-post `[extra]` flags**: `comments` (giscus), `toc` (table of contents from `page.toc`), `embeds` (allow `{{ youtube() }}`/`{{ video() }}` + scope CSP frame-src). `updated` (front-matter date) shows an "Updated" line.
+- **JSON-LD** `BlogPosting` schema in each post's `<head>` — inline `<script type="application/ld+json">` is a *data block*, so `script-src 'self'` doesn't block it.
+- **Related posts** (others sharing the first tag) and a **reading-progress bar** (`static/js/reading-progress.js`).
+- **External links** get `target=_blank` + `nofollow` + `noreferrer` (Zola `[markdown]` config).
+- **`scripts/gen-extra.py`** (run in postbuild) generates **`/feed.json`** (JSON Feed 1.1) and **`/llms.txt`** (agent-readable site map) from post front matter — base URL is hardcoded to production there, independent of the build's `--base-url`.
+- **Insights**: the engagement Worker also logs **referrer / scroll-depth / search-query** events to Workers Analytics Engine (`borai_events`), exposes **`/api/top`** (popular posts from KV view metadata), and the home shows a **"Most read"** widget. Query AE per `worker/README.md`. Adding a reaction emoji or scroll threshold means editing both the Worker and the frontend.
+
 ## Gotchas
 
 - **Posts use TOML front matter** (`+++ ... +++`), not Jekyll YAML. Categories/tags go in a `[taxonomies]` table, not top-level keys.
