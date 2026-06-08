@@ -1,6 +1,8 @@
 +++
 title = "Building takween"
 date = 2026-06-08
+# Redirect the old /blog/ URL to the new root-level one.
+aliases = ["/blog/building-takween/"]
 
 [taxonomies]
 tags = ["rust", "takween", "llm-agents", "security"]

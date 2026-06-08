@@ -3,7 +3,7 @@ title = "Archive"
 template = "archive.html"
 
 [extra]
-section_path = "blog/_index.md"
+section_path = "_index.md"
 +++
 
 # Archive

@@ -24,9 +24,10 @@ No test suite — content is Markdown, the theme handles rendering.
 
 - **`config.toml`** — single source of truth: `base_url`, identity, `taxonomies` (tags + categories), `main_menu`, `socials`, and `[extra]` theme options (color scheme, `favicon_emoji`, layout). `theme = "terminus"`.
 - **`themes/terminus`** — the theme as a git submodule (NOT vendored into the tree). To read/override a template, look here; copy a file into the matching top-level dir (`templates/`, `sass/`, `static/`) to override it. Update with `git submodule update --remote themes/terminus`.
-- **`content/`** — Zola sections, each an `_index.md` with TOML front matter (`+++`):
-  - `content/_index.md` is the home page; it surfaces recent posts via `[extra] section_path = "blog/_index.md"`.
-  - `blog/`, `projects/`, `about/`, `archive/` are sections. **About is a section, not a page, on purpose** — `page.html` renders a post-style date header and errors on dateless pages, so dateless standalone pages must use `template = "section.html"`.
+- **`content/`** — Zola sections + posts:
+  - **Posts live at the site root**, not under `/blog/` (the domain is already `blog.borai.dev`). A post is `content/<YYYY-MM-DD>-<slug>.md` (date prefix is stripped) → served at `/<slug>/`. `content/_index.md` is the home page **and** the paginated blog index (`sort_by = "date"`, `paginate_by`) — the theme's `index.html` lists the root section's own pages when no `section_path` is set.
+  - **Old `/blog/...` URLs redirect**: each post carries `aliases = ["/blog/<slug>/"]` (Zola emits a redirect stub), and `static/blog/index.html` redirects `/blog/` → `/`. Keep adding the alias to any post that ever had a `/blog/` URL.
+  - `projects/`, `about/`, `archive/`, `search/` are sections. **About/search/projects are sections, not pages, on purpose** — `page.html` renders a post-style date header and errors on dateless pages, so dateless standalone pages use `template = "section.html"`. `archive/` lists the root section via `[extra] section_path = "_index.md"`.
 - **`static/`** — copied verbatim to the site root at build. `static/CNAME` is what keeps the custom domain (Zola has no Jekyll-style root CNAME convention).
 - **`syntaxes/monokai-classic.json`** — the code-highlight theme referenced by `[markdown.highlighting] extra_themes`. Zola resolves that path from the **project root**, so it's copied up out of the theme; don't delete it or the build fails with a bare I/O error.
 - **`_archive/`** — backup of the old Jekyll posts/config (and the retired Jekyll favicon PNGs). Lives outside `content/` so Zola ignores it; never published.
