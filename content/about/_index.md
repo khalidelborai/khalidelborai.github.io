@@ -13,8 +13,8 @@ days doing rusty things (and, when it's called for, rusting things). Engineer an
 open-source contributor who likes sharing what I learn and learning from others.
 
 Most of my day is **Rust** and the fast, modern tooling around it. Buguard is a
-security company, so I live in that world too — and I still write about data
-engineering now and then.
+security company, so I live in that world too — mostly breaking things on purpose
+before someone else does it by accident.
 
 ## Elsewhere
 
