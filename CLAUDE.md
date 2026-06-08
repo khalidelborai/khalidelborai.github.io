@@ -89,6 +89,15 @@ That's the whole opt-in — a **series navigation box auto-injects** between the
 - Parts are **ordered by `date`** (publish in sequence). `weight` is not sortable on taxonomy-term pages in Zola, so date is the ordering key.
 - Styling is in **`static/css/custom.css`**, loaded site-wide via `[extra] stylesheets` and keyed off the theme's CSS variables (follows the color scheme).
 
+### Engagement (comments, reactions, views, share)
+
+All rendered by the `page.html` post template (so posts only).
+
+- **Comments — giscus** (GitHub Discussions). Per-post opt-in: `[extra] comments = true`. Config (repo/category IDs, theme) in `config.toml [extra.giscus]`; markup in `templates/partials/comments.html`. CSP adds `script-src`/`frame-src`/`style-src`/`connect-src https://giscus.app` **only on commented posts**. **Requires the giscus GitHub App** (<https://github.com/apps/giscus>) installed on the repo, and Discussions enabled (already done) — until then giscus shows a "not installed" notice, so don't flip `comments` on publicly first.
+- **Views + reactions — Cloudflare Worker** in `worker/` (KV-backed; see `worker/README.md`). Frontend is `static/js/engagement.js`; it hits a **same-origin** route (`/api/...`), so **no CSP change**. Gated on `config.toml [extra.engagement] api` — empty = widgets hidden; set to `"/api"` after deploying the Worker. Reaction emojis are pinned in both `page.html` and `worker/src/index.js` — keep them in sync.
+- **Share buttons** — X / Bluesky / LinkedIn / copy-link, rendered in `page.html`, no external deps. Copy-link handler is `static/js/share.js` (external → CSP-safe).
+- **`/now` and `/uses`** — personal-web pages (`content/now/`, `content/uses/`), sections like `/about`, linked in the nav.
+
 ## Gotchas
 
 - **Posts use TOML front matter** (`+++ ... +++`), not Jekyll YAML. Categories/tags go in a `[taxonomies]` table, not top-level keys.

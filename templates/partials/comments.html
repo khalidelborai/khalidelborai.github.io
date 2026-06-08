@@ -1,0 +1,25 @@
+{#- giscus comments (GitHub Discussions). Rendered only when a post sets
+    `[extra] comments = true`. Config (repo/category IDs, theme) lives in
+    config.toml under [extra.giscus]. Requires the giscus GitHub App installed
+    on the repo: https://github.com/apps/giscus -#}
+{%- if page.extra.comments | default(value=false) and config.extra.giscus -%}
+{%- set g = config.extra.giscus -%}
+<section class="comments" aria-label="Comments">
+    <h2>Comments</h2>
+    <script src="https://giscus.app/client.js"
+        data-repo="{{ g.repo }}"
+        data-repo-id="{{ g.repo_id }}"
+        data-category="{{ g.category }}"
+        data-category-id="{{ g.category_id }}"
+        data-mapping="{{ g.mapping | default(value='pathname') }}"
+        data-strict="1"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="{{ g.theme | default(value='transparent_dark') }}"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async></script>
+</section>
+{%- endif -%}

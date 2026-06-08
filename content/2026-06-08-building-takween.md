@@ -11,6 +11,7 @@ categories = ["projects"]
 [extra]
 mermaid = true
 asciinema = true
+# comments = true   # ← flip on once the giscus GitHub App is installed
 +++
 
 Most agent tools ask you to trust them first and find out later. You drop in an API key, point it at your repo, and hope the sandbox holds while it runs whatever the model just decided to run. I work in offensive security, and a lot of what I do is research on AI agents: autonomous pentesters that chase and chain vulnerabilities, and intelligence that watches attack surfaces and the dark web for what's already leaking. When an agent like that gets pointed at hostile systems, with real access, "hope the sandbox holds" is how you get breached by your own tool.

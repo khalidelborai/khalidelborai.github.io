@@ -40,6 +40,17 @@
         {%- set allowed_domains = allowed_domains | concat(with=a_style) | concat(with=a_worker) -%}
     {%- endif -%}
 
+    {#- SITE OVERRIDE: giscus loads client.js from giscus.app and embeds an
+        iframe from the same origin. Allow it only on posts with
+        `extra.comments = true`. -#}
+    {%- if page.extra.comments | default(value=false) -%}
+        {%- set gi_script = load_data(literal=`{"directive": "script-src", "domains": ["'self'", "https://giscus.app"]}`, format="json") -%}
+        {%- set gi_frame = load_data(literal=`{"directive": "frame-src", "domains": ["https://giscus.app"]}`, format="json") -%}
+        {%- set gi_connect = load_data(literal=`{"directive": "connect-src", "domains": ["'self'", "https://giscus.app"]}`, format="json") -%}
+        {%- set gi_style = load_data(literal=`{"directive": "style-src", "domains": ["'self'", "'unsafe-inline'", "https://giscus.app"]}`, format="json") -%}
+        {%- set allowed_domains = allowed_domains | concat(with=gi_script) | concat(with=gi_frame) | concat(with=gi_connect) | concat(with=gi_style) -%}
+    {%- endif -%}
+
     {%- set extra_domains = config.extra.content_security_policy.allowed_domains -%}
     {%- set allowed_domains = allowed_domains | concat(with=extra_domains) -%}
 

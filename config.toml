@@ -53,6 +53,8 @@ close_responsive_menu_on_resize = true
 
 main_menu = [
     { name = "projects", url = "projects", trailing_slash = true },
+    { name = "uses", url = "uses", trailing_slash = true },
+    { name = "now", url = "now", trailing_slash = true },
     { name = "archive", url = "archive", trailing_slash = true },
     { name = "tags", url = "tags", trailing_slash = true },
     { name = "search", url = "search", trailing_slash = true },
@@ -65,6 +67,22 @@ socials = [
     { name = "x", url = "https://twitter.com/elborai_khalid" },
     { name = "email", url = "mailto:khalidelborai@hotmail.com" },
 ]
+
+# giscus comments (GitHub Discussions). Add `comments = true` to a post's
+# [extra] to enable. Requires the giscus GitHub App installed on the repo.
+[extra.giscus]
+repo = "khalidelborai/khalidelborai.github.io"
+repo_id = "R_kgDOMec66A"
+category = "Announcements"
+category_id = "DIC_kwDOMec66M4C-x5_"
+mapping = "pathname"
+theme = "transparent_dark"
+
+# Views + reactions are served by a same-origin Cloudflare Worker. Leave `api`
+# empty to keep the widgets off; set it (e.g. "/api") once worker/ is deployed
+# and routed at blog.borai.dev/api/*.
+[extra.engagement]
+api = ""
 
 [extra.content_security_policy]
 enable = true

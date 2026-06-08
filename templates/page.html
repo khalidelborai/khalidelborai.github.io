@@ -25,6 +25,13 @@
     {% endfor -%}
 {%- endblock -%}
 
+{%- block head -%}
+<script src="{{ get_url(path='js/share.js', cachebust=true) }}" defer></script>
+{%- if config.extra.engagement.api %}
+<script src="{{ get_url(path='js/engagement.js', cachebust=true) }}" defer></script>
+{%- endif %}
+{%- endblock -%}
+
 {%- block main -%}
 {%- filter indent -%}{%- filter indent -%}
 <article class="post content">
@@ -63,7 +70,31 @@
 </aside>
 {%- endif -%}
 
+{#- View counter (dormant until config.extra.engagement.api is set). -#}
+{%- if config.extra.engagement.api -%}
+<div class="post-views" data-engagement="views" data-api="{{ config.extra.engagement.api }}" data-path="{{ page.path }}" aria-live="polite"></div>
+{%- endif -%}
+
 {{ page.content | safe }}
+
+{#- Engagement footer: emoji reactions (Worker-backed) + social share. -#}
+<footer class="post-engagement">
+{%- if config.extra.engagement.api -%}
+    <div class="reactions" data-engagement="reactions" data-api="{{ config.extra.engagement.api }}" data-path="{{ page.path }}">
+        <button type="button" data-emoji="👍" aria-label="React with 👍">👍 <span class="count">·</span></button>
+        <button type="button" data-emoji="🦀" aria-label="React with 🦀">🦀 <span class="count">·</span></button>
+        <button type="button" data-emoji="🔥" aria-label="React with 🔥">🔥 <span class="count">·</span></button>
+        <button type="button" data-emoji="❤️" aria-label="React with ❤️">❤️ <span class="count">·</span></button>
+    </div>
+{%- endif -%}
+    <div class="share">
+        <span class="share__label">share</span>
+        <a href="https://twitter.com/intent/tweet?text={{ page.title | urlencode }}&url={{ page.permalink | urlencode }}" target="_blank" rel="noopener">X</a>
+        <a href="https://bsky.app/intent/compose?text={{ page.title | urlencode }}%20{{ page.permalink | urlencode }}" target="_blank" rel="noopener">Bluesky</a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ page.permalink | urlencode }}" target="_blank" rel="noopener">LinkedIn</a>
+        <button type="button" class="share__copy" data-copy="{{ page.permalink }}">copy link</button>
+    </div>
+</footer>
 
 {%- filter indent -%}{%- filter indent %}
 </article>

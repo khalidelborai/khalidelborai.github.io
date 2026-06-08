@@ -56,3 +56,63 @@
   content: "▸ ";
   color: var(--accent-color);
 }
+
+/* --- Post views --- */
+.post-views {
+  margin: -0.4rem 0 1.2rem;
+  color: var(--footnote-color, rgba(255, 255, 255, 0.5));
+  font-size: 0.85em;
+}
+
+/* --- Engagement footer: reactions + share --- */
+.post-engagement {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed color-mix(in srgb, var(--text-color) 20%, transparent);
+  font-size: 0.9em;
+}
+
+.reactions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.reactions button {
+  padding: 0.15em 0.6em;
+  font: inherit;
+  color: var(--text-color);
+  background: color-mix(in srgb, var(--text-color) 5%, var(--background-color));
+  border: 1px solid color-mix(in srgb, var(--text-color) 18%, transparent);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.reactions button:hover { border-color: var(--accent-color); }
+.reactions button.reacted { border-color: var(--accent-color); transform: scale(1.08); }
+.reactions .count { color: var(--footnote-color); font-size: 0.9em; }
+
+.share { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
+.share__label {
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72em;
+}
+.share a,
+.share__copy {
+  padding: 0;
+  font: inherit;
+  color: var(--text-color);
+  text-decoration: none;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent-color) 50%, transparent);
+  cursor: pointer;
+}
+.share a:hover,
+.share__copy:hover { color: var(--accent-color); }
+
+/* --- giscus comments --- */
+.comments { margin-top: 3rem; }
+.comments h2 { margin-bottom: 1rem; }
