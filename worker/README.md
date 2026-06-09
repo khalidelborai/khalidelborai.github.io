@@ -95,9 +95,13 @@ Now `/stats` is gated by Access (SSO/MFA at the edge **and** JWT-verified in the
 Worker). The old `STATS_PASSWORD` secret is unused — `wrangler secret delete
 STATS_PASSWORD`.
 
-### Analytics token
+### Data source — KV only, no token
 
-The AE sections need a Cloudflare API token (**Account Analytics: Read**):
-`npx wrangler secret put CF_API_TOKEN`. Until it's set, the KV sections (views,
-reactions, most-read) still work and the AE sections show a hint. `CF_ACCOUNT_ID`
-is a non-secret var in `wrangler.jsonc`.
+The dashboard reads **entirely from KV**: view counts, reaction totals, and small
+aggregate counters the Worker bumps on each event (`agg:ref:<host>`,
+`agg:search:<query>`, `agg:depth:<25|50|75|100>`). **No API token, no external
+call.**
+
+Events are also logged to Analytics Engine (`borai_events`) for optional deeper
+ad-hoc analysis — querying that raw stream needs a Cloudflare API token (the SQL
+example above), but the dashboard never touches it.

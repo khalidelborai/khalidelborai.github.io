@@ -21,6 +21,33 @@ const json = (data, status = 200) =>
 
 const num = (v) => parseInt(v || "0", 10);
 
+// Increment a KV aggregate counter, storing count + label in metadata so a
+// single list() can read+rank them without per-key GETs.
+async function kvIncr(env, key, label) {
+  const n = num(await env.ENGAGEMENT.get(key)) + 1;
+  await env.ENGAGEMENT.put(key, String(n), { metadata: { count: n, label: String(label).slice(0, 120) } });
+}
+
+function refHost(referrer) {
+  try {
+    const h = new URL(referrer).hostname.replace(/^www\./, "");
+    return h && h !== "blog.borai.dev" ? h : "";
+  } catch (_) {
+    return "";
+  }
+}
+
+async function aggTop(env, prefix, n = 15) {
+  const list = await env.ENGAGEMENT.list({ prefix });
+  return list.keys
+    .map((k) => ({
+      label: (k.metadata && k.metadata.label) || k.name.slice(prefix.length),
+      count: (k.metadata && k.metadata.count) || 0,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, n);
+}
+
 async function readViews(env, path) {
   return num(await env.ENGAGEMENT.get("views:" + path));
 }
@@ -74,10 +101,14 @@ async function accessKeys(team) {
 }
 
 async function verifyAccess(request, env) {
-  const team = env.ACCESS_TEAM_DOMAIN, aud = env.ACCESS_AUD;
-  if (!team || !aud) return false;
   const token = request.headers.get("Cf-Access-Jwt-Assertion");
-  if (!token) return false;
+  if (!token) return false; // request didn't pass through Cloudflare Access → deny
+  // Trust the edge: Access has already authenticated (OTP/SSO) and injected this
+  // header (and strips any client-supplied copy), and /stats is only reachable
+  // through the Access-protected route. Set ACCESS_TEAM_DOMAIN + ACCESS_AUD to
+  // additionally verify the JWT signature (defense in depth).
+  const team = env.ACCESS_TEAM_DOMAIN, aud = env.ACCESS_AUD;
+  if (!team || !aud) return true;
   const parts = token.split(".");
   if (parts.length !== 3) return false;
   let header, payload;
@@ -100,21 +131,6 @@ async function verifyAccess(request, env) {
       new TextEncoder().encode(parts[0] + "." + parts[1])
     );
   } catch (_) { return false; }
-}
-
-async function aeQuery(env, sql) {
-  if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) return null;
-  try {
-    const r = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/analytics_engine/sql`,
-      { method: "POST", headers: { Authorization: `Bearer ${env.CF_API_TOKEN}` }, body: sql }
-    );
-    if (!r.ok) return null;
-    const j = await r.json();
-    return j.data || [];
-  } catch (_) {
-    return null;
-  }
 }
 
 const esc = (s) =>
@@ -143,7 +159,7 @@ overflow:hidden;text-overflow:ellipsis}td.n{text-align:right;color:var(--ac);whi
 .empty{color:var(--dim)}footer{margin-top:2rem;color:var(--dim);font-size:.78rem}
 </style></head><body><div class="wrap"><h1>stats <small>blog.borai.dev · last 30 days</small></h1>${sections
     .map(table)
-    .join("")}<footer>private · Cloudflare Analytics Engine + KV</footer></div></body></html>`;
+    .join("")}<footer>private · Cloudflare KV</footer></div></body></html>`;
 }
 
 async function handleStats(request, env) {
@@ -171,41 +187,28 @@ async function handleStats(request, env) {
     .sort((a, b) => b.views - a.views)
     .slice(0, 10);
 
-  // AE: referrers, searches, scroll depth, views by path.
-  const W = "timestamp >= NOW() - INTERVAL '30' DAY";
-  const [refs, searches, depth, totals] = await Promise.all([
-    aeQuery(env, `SELECT blob3 AS k, COUNT(*) AS n FROM ${DATASET} WHERE blob1='view' AND blob3 != '' AND ${W} GROUP BY blob3 ORDER BY n DESC LIMIT 15`),
-    aeQuery(env, `SELECT blob4 AS k, COUNT(*) AS n FROM ${DATASET} WHERE blob1='search' AND blob4 != '' AND ${W} GROUP BY blob4 ORDER BY n DESC LIMIT 15`),
-    aeQuery(env, `SELECT double1 AS k, COUNT(*) AS n FROM ${DATASET} WHERE blob1='scroll' AND ${W} GROUP BY double1 ORDER BY double1`),
-    aeQuery(env, `SELECT COUNT(*) AS n FROM ${DATASET} WHERE blob1='view' AND ${W}`),
+  // KV aggregates (no token needed): referrers, searches, scroll depth.
+  const [refs, searches, depthRaw] = await Promise.all([
+    aggTop(env, "agg:ref:"),
+    aggTop(env, "agg:search:"),
+    aggTop(env, "agg:depth:", 4),
   ]);
+  const depth = depthRaw.sort((a, b) => parseInt(a.label) - parseInt(b.label));
+  const totalViews = popular.reduce((a, p) => a + p.views, 0);
 
-  const ae_on = refs !== null;
   const sections = [
     {
       title: "overview",
       rows: [
-        ["page views (30d)", ae_on && totals && totals[0] ? totals[0].n : "—"],
+        ["total views", totalViews],
         ["reactions", Object.values(reactTotals).reduce((a, b) => a + b, 0)],
       ],
     },
-    { title: "most read (all time)", rows: popular.map((p) => [p.title, p.views]) },
+    { title: "most read", rows: popular.map((p) => [p.title, p.views]) },
     { title: "reactions", rows: Object.entries(reactTotals).map(([e, n]) => [e, n]) },
-    {
-      title: "top referrers (30d)",
-      rows: ae_on && refs ? refs.map((r) => [r.k, r.n]) : null,
-      empty: ae_on ? "no referrers yet" : "set CF_API_TOKEN + CF_ACCOUNT_ID to enable",
-    },
-    {
-      title: "search queries (30d)",
-      rows: ae_on && searches ? searches.map((r) => [r.k, r.n]) : null,
-      empty: ae_on ? "no searches yet" : "—",
-    },
-    {
-      title: "read depth (30d)",
-      rows: ae_on && depth ? depth.map((r) => [Math.round(r.k) + "%", r.n]) : null,
-      empty: ae_on ? "no scroll data yet" : "—",
-    },
+    { title: "top referrers", rows: refs.map((r) => [r.label, r.count]), empty: "no off-site referrers yet" },
+    { title: "search queries", rows: searches.map((r) => [r.label, r.count]), empty: "no searches yet" },
+    { title: "read depth", rows: depth.map((r) => [r.label, r.count]), empty: "no scroll data yet" },
   ];
 
   return new Response(renderStats(sections), {
@@ -233,6 +236,8 @@ export default {
           metadata: { count: views, title: (title || "").slice(0, 160) },
         });
         logEvent(env, "view", path, { referrer });
+        const host = refHost(referrer);
+        if (host) await kvIncr(env, "agg:ref:" + host, host);
         return json({ views });
       }
       const path = url.searchParams.get("path");
@@ -256,6 +261,13 @@ export default {
     if (route === "/event" && request.method === "POST") {
       const body = await request.json().catch(() => ({}));
       logEvent(env, body.type, body.path, body);
+      if (body.type === "scroll" && body.depth) {
+        const d = Math.round(Number(body.depth));
+        if ([25, 50, 75, 100].includes(d)) await kvIncr(env, "agg:depth:" + d, d + "%");
+      } else if (body.type === "search" && body.query) {
+        const q = String(body.query).toLowerCase().trim().slice(0, 80);
+        if (q) await kvIncr(env, "agg:search:" + q, q);
+      }
       return json({ ok: true });
     }
 
