@@ -6,8 +6,14 @@
   // Same-origin route so the site can fetch "/api/...". borai.dev must be an
   // active zone on your Cloudflare account (it is — the blog proxies through it).
   "routes": [
-    { "pattern": "blog.borai.dev/api/*", "zone_name": "borai.dev" }
+    { "pattern": "blog.borai.dev/api/*", "zone_name": "borai.dev" },
+    { "pattern": "blog.borai.dev/stats", "zone_name": "borai.dev" }
   ],
+
+  // Account ID is not secret (it's in dashboard URLs). The API token + stats
+  // password are Worker secrets: `wrangler secret put CF_API_TOKEN` and
+  // `wrangler secret put STATS_PASSWORD`.
+  "vars": { "CF_ACCOUNT_ID": "0fb46a910cc68c57468ccffc325ed5b6" },
 
   // id filled in by `wrangler kv namespace create ENGAGEMENT`.
   "kv_namespaces": [

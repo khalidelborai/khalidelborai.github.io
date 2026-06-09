@@ -10,6 +10,7 @@ on:
       - LICENSE
       - CLAUDE.md
       - _archive/**
+      - worker/** # deploys separately via `wrangler`, not GitHub Pages
 
   workflow_dispatch:
 

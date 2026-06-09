@@ -64,3 +64,35 @@ Analytics Engine** (`borai_events` dataset): page views with **referrer**,
   `blob4=query`, `double1=scroll depth`, `index1=path`. Example aggregates: top
   referrers (`GROUP BY blob3`), search terms (`WHERE blob1='search' GROUP BY blob4`),
   median read depth (`WHERE blob1='scroll'`).
+
+## Dashboard (`/stats`)
+
+`https://blog.borai.dev/stats` is a private HTML dashboard the Worker renders
+itself — it queries Analytics Engine (referrers, searches, read depth) and KV
+(views, reactions) **server-side**, so the API token never reaches the browser.
+
+Two secrets enable it (no redeploy needed after setting them):
+
+```sh
+cd worker
+# 1. password for the dashboard's HTTP Basic Auth
+npx wrangler secret put STATS_PASSWORD
+
+# 2. Cloudflare API token with **Account Analytics: Read**
+#    (dash.cloudflare.com → My Profile → API Tokens → Create)
+npx wrangler secret put CF_API_TOKEN
+```
+
+Until `STATS_PASSWORD` is set the page returns 401; until `CF_API_TOKEN` is set
+the KV sections still work but the AE sections show a hint. `CF_ACCOUNT_ID` lives
+in `wrangler.jsonc` (not a secret).
+
+### Gating with Zero Trust (optional, recommended later)
+
+The Basic-Auth password is a simple stopgap. To put **Cloudflare Access**
+(Zero Trust) in front instead — SSO/MFA, no shared password — add a self-hosted
+Access application for `blog.borai.dev/stats` with an allow policy (e.g. your
+email). Access enforces auth at the edge *before* the request reaches the Worker,
+so it composes with (or replaces) the Basic-Auth check with **zero code changes**.
+If you want the Worker to fully trust Access, switch `authed()` to verify the
+`Cf-Access-Jwt-Assertion` header instead of the password.
