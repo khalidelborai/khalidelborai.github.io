@@ -48,25 +48,58 @@ function logEvent(env, type, path, fields = {}) {
 
 // ---- /stats dashboard ----
 
-function unauthorized() {
-  return new Response("Authentication required.", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="borai stats"' },
-  });
+// Gated by Cloudflare Access (Zero Trust): verify the Access JWT it injects.
+// Fails closed — if ACCESS_TEAM_DOMAIN/ACCESS_AUD aren't set, or the token is
+// missing/invalid, access is denied (no exposure before Access is configured).
+let jwksCache = { team: null, keys: null, at: 0 };
+
+function b64urlBytes(s) {
+  s = s.replace(/-/g, "+").replace(/_/g, "/");
+  s += "=".repeat((4 - (s.length % 4)) % 4);
+  const bin = atob(s);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+const b64urlStr = (s) => new TextDecoder().decode(b64urlBytes(s));
+
+async function accessKeys(team) {
+  const now = Date.now();
+  if (jwksCache.team === team && jwksCache.keys && now - jwksCache.at < 3600000) return jwksCache.keys;
+  const r = await fetch(`https://${team}.cloudflareaccess.com/cdn-cgi/access/certs`);
+  if (!r.ok) return null;
+  const j = await r.json();
+  jwksCache = { team, keys: j.keys || [], at: now };
+  return jwksCache.keys;
 }
 
-function authed(request, env) {
-  const expected = env.STATS_PASSWORD;
-  if (!expected) return false;
-  const header = request.headers.get("Authorization") || "";
-  if (!header.startsWith("Basic ")) return false;
-  let pass = "";
-  try { pass = atob(header.slice(6)).split(":").slice(1).join(":"); } catch (_) { return false; }
-  // length-padded compare to blunt timing differences
-  if (pass.length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < pass.length; i++) diff |= pass.charCodeAt(i) ^ expected.charCodeAt(i);
-  return diff === 0;
+async function verifyAccess(request, env) {
+  const team = env.ACCESS_TEAM_DOMAIN, aud = env.ACCESS_AUD;
+  if (!team || !aud) return false;
+  const token = request.headers.get("Cf-Access-Jwt-Assertion");
+  if (!token) return false;
+  const parts = token.split(".");
+  if (parts.length !== 3) return false;
+  let header, payload;
+  try {
+    header = JSON.parse(b64urlStr(parts[0]));
+    payload = JSON.parse(b64urlStr(parts[1]));
+  } catch (_) { return false; }
+  const audOk = Array.isArray(payload.aud) ? payload.aud.includes(aud) : payload.aud === aud;
+  if (!audOk) return false;
+  if (!payload.exp || Date.now() / 1000 >= payload.exp) return false;
+  const keys = await accessKeys(team);
+  const jwk = keys && keys.find((k) => k.kid === header.kid);
+  if (!jwk) return false;
+  try {
+    const key = await crypto.subtle.importKey(
+      "jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]
+    );
+    return await crypto.subtle.verify(
+      "RSASSA-PKCS1-v1_5", key, b64urlBytes(parts[2]),
+      new TextEncoder().encode(parts[0] + "." + parts[1])
+    );
+  } catch (_) { return false; }
 }
 
 async function aeQuery(env, sql) {
@@ -114,7 +147,12 @@ overflow:hidden;text-overflow:ellipsis}td.n{text-align:right;color:var(--ac);whi
 }
 
 async function handleStats(request, env) {
-  if (!authed(request, env)) return unauthorized();
+  if (!(await verifyAccess(request, env))) {
+    return new Response("This dashboard is gated by Cloudflare Access.", {
+      status: 403,
+      headers: { "content-type": "text/plain;charset=utf-8" },
+    });
+  }
 
   // KV: reaction totals per emoji + popular posts.
   const [reactList, viewList] = await Promise.all([

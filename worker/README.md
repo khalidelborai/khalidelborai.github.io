@@ -71,28 +71,33 @@ Analytics Engine** (`borai_events` dataset): page views with **referrer**,
 itself — it queries Analytics Engine (referrers, searches, read depth) and KV
 (views, reactions) **server-side**, so the API token never reaches the browser.
 
-Two secrets enable it (no redeploy needed after setting them):
+### Auth: Cloudflare Access (Zero Trust)
 
-```sh
-cd worker
-# 1. password for the dashboard's HTTP Basic Auth
-npx wrangler secret put STATS_PASSWORD
+The Worker trusts **Cloudflare Access** — it verifies the Access JWT
+(`Cf-Access-Jwt-Assertion`) and **fails closed** otherwise (so `/stats` is denied
+until Access is configured — no exposure window, no shared password).
 
-# 2. Cloudflare API token with **Account Analytics: Read**
-#    (dash.cloudflare.com → My Profile → API Tokens → Create)
-npx wrangler secret put CF_API_TOKEN
-```
+1. **Zero Trust dashboard → Access → Applications → Add an application →
+   Self-hosted.** Domain `blog.borai.dev`, path `stats`. Add a policy:
+   *Allow* · Include → *Emails* → your email (or GitHub/Google SSO).
+2. Open the app → copy its **Application Audience (AUD) Tag**. Your **team name**
+   is the `<x>` in `https://<x>.cloudflareaccess.com` (Zero Trust → Settings).
+3. Fill them into `wrangler.jsonc` `vars` and redeploy:
+   ```jsonc
+   "ACCESS_TEAM_DOMAIN": "<team>",
+   "ACCESS_AUD": "<aud-tag>"
+   ```
+   ```sh
+   npx wrangler deploy
+   ```
 
-Until `STATS_PASSWORD` is set the page returns 401; until `CF_API_TOKEN` is set
-the KV sections still work but the AE sections show a hint. `CF_ACCOUNT_ID` lives
-in `wrangler.jsonc` (not a secret).
+Now `/stats` is gated by Access (SSO/MFA at the edge **and** JWT-verified in the
+Worker). The old `STATS_PASSWORD` secret is unused — `wrangler secret delete
+STATS_PASSWORD`.
 
-### Gating with Zero Trust (optional, recommended later)
+### Analytics token
 
-The Basic-Auth password is a simple stopgap. To put **Cloudflare Access**
-(Zero Trust) in front instead — SSO/MFA, no shared password — add a self-hosted
-Access application for `blog.borai.dev/stats` with an allow policy (e.g. your
-email). Access enforces auth at the edge *before* the request reaches the Worker,
-so it composes with (or replaces) the Basic-Auth check with **zero code changes**.
-If you want the Worker to fully trust Access, switch `authed()` to verify the
-`Cf-Access-Jwt-Assertion` header instead of the password.
+The AE sections need a Cloudflare API token (**Account Analytics: Read**):
+`npx wrangler secret put CF_API_TOKEN`. Until it's set, the KV sections (views,
+reactions, most-read) still work and the AE sections show a hint. `CF_ACCOUNT_ID`
+is a non-secret var in `wrangler.jsonc`.

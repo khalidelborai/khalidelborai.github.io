@@ -10,10 +10,19 @@
     { "pattern": "blog.borai.dev/stats", "zone_name": "borai.dev" }
   ],
 
-  // Account ID is not secret (it's in dashboard URLs). The API token + stats
-  // password are Worker secrets: `wrangler secret put CF_API_TOKEN` and
-  // `wrangler secret put STATS_PASSWORD`.
-  "vars": { "CF_ACCOUNT_ID": "0fb46a910cc68c57468ccffc325ed5b6" },
+  // Non-secret config. CF_API_TOKEN (Account Analytics: Read) stays a secret:
+  // `wrangler secret put CF_API_TOKEN`.
+  //   CF_ACCOUNT_ID       — for the Analytics Engine SQL API
+  //   ACCESS_TEAM_DOMAIN  — your Zero Trust team name (the <x> in
+  //                         https://<x>.cloudflareaccess.com), e.g. "borai"
+  //   ACCESS_AUD          — the Access application's Audience (AUD) tag
+  // /stats fails closed until ACCESS_TEAM_DOMAIN + ACCESS_AUD are set and the
+  // Access application is configured for blog.borai.dev/stats.
+  "vars": {
+    "CF_ACCOUNT_ID": "0fb46a910cc68c57468ccffc325ed5b6",
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": ""
+  },
 
   // id filled in by `wrangler kv namespace create ENGAGEMENT`.
   "kv_namespaces": [
